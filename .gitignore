@@ -1,2 +1,4 @@
 downloaded_files/
+.vscode/
+__pycache__
 *.pyc
