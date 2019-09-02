@@ -84,7 +84,3 @@ class ConvertToWRS:
 
         # Return the results list to the user
         return res
-
-converter = ConvertToWRS("./wrs2_shapefiles/wrs2_descending.shp")
-test_converter = converter.get_wrs(37.234332396, -115.80666344)
-print(test_converter)
