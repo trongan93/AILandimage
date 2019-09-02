@@ -22,7 +22,7 @@ import datetime
 import csv
 import re
 import json
-
+from constants import *
 from convert_to_wrs import ConvertToWRS
 
 ###########################################################################
@@ -101,7 +101,8 @@ def connect_earthexplorer_no_proxy(usgs):
     data = f.read()
     f.close()
     data = data.decode('utf-8')
-    if data.find('You must sign in as a registered user to download data or place orders for USGS EROS products') > 0:
+    if data.find('Authentication Failed') > 0:
+    # if data.find('You must sign in as a registered user to download data or place orders for USGS EROS products') > 0:
         print("Authentification failed")
         sys.exit(-1)
     return
@@ -398,9 +399,9 @@ def main():
         parser.add_option("-b", "--sat", dest="bird", action="store", type="choice",
                           help="Which satellite are you looking for", choices=['LT5', 'LE7', 'LC8'], default='LC8')
         parser.add_option("--output", dest="output", action="store", type="string",
-                          help="Where to download files", default='./downloaded_files')
+                          help="Where to download files", default=BASE_PATH)
         parser.add_option("--outputcatalogs", dest="outputcatalogs", action="store", type="string",
-                          help="Where to download metadata catalog files", default='./downloaded_files/metadata-catalog')
+                          help="Where to download metadata catalog files", default=METADATA_CATALOG)
         parser.add_option("--dir", dest="dir", action="store", type="string",
                           help="Dir number where files  are stored at USGS", default=None)
         parser.add_option("--collection", dest="collection", action="store", type="int",
@@ -593,7 +594,7 @@ def main():
         lat = options.latitude
         lng = options.longitude
 
-        wrs_converter = ConvertToWRS("./wrs2_shapefiles/wrs2_descending.shp")
+        wrs_converter = ConvertToWRS(WRS_SHAPE_FILE_PATH)
         wrs = wrs_converter.get_wrs(lat, lng)
         print(wrs)
         for cell in wrs:
