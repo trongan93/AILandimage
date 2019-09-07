@@ -1,7 +1,8 @@
-from constants import WRS_SHAPE_FILE_PATH
-import sys
-sys.path.insert(1, '../')
+import sys, os
+currentdir = os.path.dirname(sys.path[0]) #ref: https://stackoverflow.com/questions/714063/importing-modules-from-parent-folder
+sys.path[0] = currentdir
 
+from constants import WRS_SHAPE_FILE_PATH
 from convert_to_wrs import ConvertToWRS
 
 converter = ConvertToWRS(WRS_SHAPE_FILE_PATH)
