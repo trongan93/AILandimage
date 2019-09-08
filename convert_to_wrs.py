@@ -84,3 +84,35 @@ class ConvertToWRS:
 
         # Return the results list to the user
         return res
+
+
+# https://landsatlook.usgs.gov/arcgis/rest/services/LLook_Outlines/MapServer/1/query?where=MODE=%27D%27&geometry=106.883,%2010.812&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&returnTrueCurves=false&returnIdsOnly=false&returnCountOnly=false&returnZ=false&returnM=false&returnDistinctValues=false&f=json
+
+# " Get WRS from USGS Rest Service
+
+def get_wrs_rest(lat, lng):
+    url = "https://landsatlook.usgs.gov/arcgis/rest/services/LLook_Outlines/MapServer/1/query?where=MODE=%%27D%%27&geometry=%s,%%20%s&geometryType=esriGeometryPoint&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&returnTrueCurves=false&returnIdsOnly=false&returnCountOnly=false&returnZ=false&returnM=false&returnDistinctValues=false&f=json" % (
+        lng, lat)
+
+    print(url)
+    web_url = urllib.request.urlopen(url)
+    data = web_url.read()
+    response = json.loads(data.decode("utf-8"))
+    print(json.dumps(response, indent=2, sort_keys=True))
+    features = list(response["features"])
+
+    return features
+
+# "Convert latitude, longitude to WRS Path and WRS Row by using USGS Rest Service
+
+def latlng_to_wrs_rest(lat, lng):
+    wrs = list()
+    features = get_wrs_rest(lat, lng)
+
+    for feature in features:
+        path = feature["attributes"]["PATH"]
+        row = feature["attributes"]["ROW"]
+        wrs.append((path, row))
+        print("Path: %s, Row: %s" % (int(path), int(row)))
+
+    return wrs
