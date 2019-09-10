@@ -4,19 +4,37 @@ import csv
 import datetime
 # "Read image metadata
 
+def read_attributes_in_metadata(metadatafile, attribute_names):
+    """
+    attributes: array of attributes
+    """
+    attribute_values = dict()
+    
+    with open(metadatafile, 'r') as metadata:
+        for line in metadata:
+            line = line.replace('\r', '')
+            for name in attribute_names:
+                if line.find(name) >= 0:
+                    lineval = line[line.find('= ')+2:]
+                    lineval = lineval.replace('\n', '')
+                    attribute_values[name] = lineval
+
+    return attribute_values
+
 def read_cloudcover_in_metadata(image_path):
     fields = ['CLOUD_COVER']
     cloud_cover = 0
+
     imagename = os.path.basename(os.path.normpath(image_path))
     metadatafile = os.path.join(image_path, imagename+'_MTL.txt')
-    metadata = open(metadatafile, 'r')
-    # metadata.replace('\r','')
-    for line in metadata:
-        line = line.replace('\r', '')
-        for f in fields:
-            if line.find(f) >= 0:
-                lineval = line[line.find('= ')+2:]
-                cloud_cover = lineval.replace('\n', '')
+    with open(metadatafile, 'r') as metadata:
+        # metadata.replace('\r','')
+        for line in metadata:
+            line = line.replace('\r', '')
+            for f in fields:
+                if line.find(f) >= 0:
+                    lineval = line[line.find('= ')+2:]
+                    cloud_cover = lineval.replace('\n', '')
     return float(cloud_cover)
 
 # "Check cloud cover limit

@@ -1,4 +1,5 @@
-DOWNLOADED_BASE_PATH = '/media/trongan93/Data/ProjectData/Landsat'
+DOWNLOADED_BASE_PATH = '/home/trongan93/Projects/AILandimage/downloaded_files/tmp'
+IMAGE_BASE_PATH = '/home/trongan93/Projects/AILandimage/downloaded_files/Images'
 INPUT_FILE_PATH = '/home/trongan93/Projects/AILandimage/input.csv'
 BACKUP_FILE_PATH = '/home/trongan93/Projects/AILandimage/backup.csv'
 METADATA_CATALOG = '/media/trongan93/Data/ProjectData/Landsat/metadata-catalog'

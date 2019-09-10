@@ -141,7 +141,6 @@ def getmetadatafiles(destdir, option):
         elif option == 'update':
             urllib.request.urlretrieve(url, destfile)
 
-
 def unzipimage(tgzfile, outputdir):
     """
     Unzip tgz file
@@ -203,7 +202,42 @@ def get_repert_and_stations(satellite):
                     'PAC', 'KIS', 'CHM', 'LGS', 'MGR', 'COA', 'MPS', 'JSA']
     return (repert, stations)
 
-# "Write info to logfile
+def makedir_if_path_not_exists(path):
+    if not(os.path.exists(path)):
+        os.mkdir(path)
+
+def organize_images(is_filter_enabled, cloudcover=None):
+    for root, dirs, files in os.walk(DOWNLOADED_BASE_PATH):
+        for filename in files:
+            if filename.endswith("_MTL.txt"):
+                attribute_values = read_attributes_in_metadata(os.path.join(root, filename), ['DATE_ACQUIRED', 'TARGET_WRS_PATH', 'TARGET_WRS_ROW', 'CLOUDCOVER'])
+
+                # Location
+                location = os.path.join(IMAGE_BASE_PATH, str(attribute_values['TARGET_WRS_PATH']).zfill(3) + str(attribute_values['TARGET_WRS_ROW']).zfill(3))
+                # makedir_if_path_not_exists(location)
+
+                # Time
+                location = os.path.join(location, attribute_values['DATE_ACQUIRED'])
+                # makedir_if_path_not_exists(location)
+
+                # DatasetType
+                location = os.path.join(location, filename[0:filename.index('_')])
+                # makedir_if_path_not_exists(location)
+
+                # Filter
+                if is_filter_enabled == True:
+                    if cloudcover != None:
+                        location = os.path.join(location, "CLOUDCOVER")
+                    else:
+                        location = os.path.join(location, "DEFAULT FILTER")
+                else:
+                    location = os.path.join(location, "NO FILTER")
+                # makedir_if_path_not_exists(location)
+
+                print("Moving data...")
+                shutil.copytree(root, location)
+                shutil.rmtree(root)
+                print("...Completed moving data")
 
 def log(location, info):
     logfile = os.path.join(location, 'log.txt')
@@ -395,9 +429,7 @@ def main():
                 connect_earthexplorer_no_proxy(usgs)
 
 
-            location = DOWNLOADED_BASE_PATH + '/' + str(path).zfill(3) + str(row).zfill(3)
-            if not(os.path.exists(location)):
-                os.makedirs(location)
+            location = DOWNLOADED_BASE_PATH
 
             (repert, stations) = get_repert_and_stations(satellite)
 
@@ -427,6 +459,8 @@ def main():
                         print(url)
                         if os.path.exists(lsdestdir):
                             print('product %s already downloaded and unzipped' % product_id)
+                            isFilterEnabled = options.cloud != None
+                            organize_images(isFilterEnabled, options.clouds)
                             check = 0
                         elif os.path.isfile(tgzfile):
                             print('product %s already downloaded' % product_id)
@@ -434,6 +468,9 @@ def main():
                                 p = unzipimage(product_id, location)
                                 if p == 1 and options.clouds != None:
                                     check = check_cloud_limit(lsdestdir, options.clouds)
+                                if check == 1:
+                                    isFilterEnabled = options.cloud != None
+                                    organize_images(isFilterEnabled, options.clouds)
                         else:
                             try:
                                 downloadChunks(url, "%s" % location, product_id+'.tgz')
@@ -481,9 +518,7 @@ def main():
                     else:
                         connect_earthexplorer_no_proxy(usgs)
 
-                    location = DOWNLOADED_BASE_PATH + '/' + str(path).zfill(3) + str(row).zfill(3)
-                    if not(os.path.exists(location)):
-                        os.makedirs(location)
+                    location = DOWNLOADED_BASE_PATH
 
                     (repert, stations) = get_repert_and_stations(satellite)
 
@@ -510,6 +545,8 @@ def main():
                                 print(url)
                                 if os.path.exists(lsdestdir):
                                     print('product %s already downloaded and unzipped' % product_id)
+                                    isFilterEnabled = options.cloud != None
+                                    organize_images(isFilterEnabled, options.clouds)
                                     check = 0
                                 elif os.path.isfile(tgzfile):
                                     print('product %s already downloaded' % product_id)
@@ -517,6 +554,9 @@ def main():
                                         p = unzipimage(product_id, location)
                                         if p == 1 and cloudcover != None:
                                             check = check_cloud_limit(lsdestdir, cloudcover)
+                                        if check == 1:
+                                            isFilterEnabled = options.cloud != None
+                                            organize_images(isFilterEnabled, options.clouds)
                                 else:
                                     try:
                                         downloadChunks(url, "%s" % location, product_id+'.tgz')
@@ -539,4 +579,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()        
+    organize_images(True, cloudcover=None)
+    # main()        
