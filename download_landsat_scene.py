@@ -428,8 +428,10 @@ def main():
             else:
                 connect_earthexplorer_no_proxy(usgs)
 
-
-            location = DOWNLOADED_BASE_PATH
+            location = os.path.join(DOWNLOADED_BASE_PATH, 'tmp')
+            data_folder = os.path.join(DOWNLOADED_BASE_PATH, 'Images')           
+            makedir_if_path_not_exists(location)
+            makedir_if_path_not_exists(data_folder)
 
             (repert, stations) = get_repert_and_stations(satellite)
 
@@ -518,7 +520,10 @@ def main():
                     else:
                         connect_earthexplorer_no_proxy(usgs)
 
-                    location = DOWNLOADED_BASE_PATH
+                    location = os.path.join(DOWNLOADED_BASE_PATH, 'tmp')
+                    data_folder = os.path.join(DOWNLOADED_BASE_PATH, 'Images')     
+                    makedir_if_path_not_exists(location)
+                    makedir_if_path_not_exists(data_folder)
 
                     (repert, stations) = get_repert_and_stations(satellite)
 
