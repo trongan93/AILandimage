@@ -1,7 +1,8 @@
+# ref: https://gis.stackexchange.com/questions/221292/retrieve-pixel-value-with-geographic-coordinate-as-input-with-gdal/221430
 from osgeo import gdal
 
 driver = gdal.GetDriverByName('GTiff')
-filename = "/mnt/2A967D2D967CFB21/ProjectData/CubeSAT/USGSData/LT05_L1TP_019050_20100204_20161017_01_T1/LT05_L1TP_019050_20100204_20161017_01_T1_B1.TIF" #path to raster
+filename = "/mnt/2A967D2D967CFB21/ProjectData/CubeSAT/USGSData/LT05_L1TP_019050_20100204_20161017_01_T1/LT05_L1TP_019050_20100204_20161017_01_T1_B7.TIF" #path to raster
 dataset = gdal.Open(filename)
 band = dataset.GetRasterBand(1)
 
