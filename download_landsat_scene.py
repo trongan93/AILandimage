@@ -207,22 +207,22 @@ def makedir_if_path_not_exists(path):
         os.mkdir(path)
 
 def organize_images(is_filter_enabled, cloudcover=None):
-    for root, dirs, files in os.walk(DOWNLOADED_BASE_PATH):
+    for root, dirs, files in os.walk(os.path.join(DOWNLOADED_BASE_PATH, 'tmp')):
         for filename in files:
             if filename.endswith("_MTL.txt"):
                 attribute_values = read_attributes_in_metadata(os.path.join(root, filename), ['DATE_ACQUIRED', 'TARGET_WRS_PATH', 'TARGET_WRS_ROW', 'CLOUDCOVER'])
 
                 # Location
                 location = os.path.join(IMAGE_BASE_PATH, str(attribute_values['TARGET_WRS_PATH']).zfill(3) + str(attribute_values['TARGET_WRS_ROW']).zfill(3))
-                # makedir_if_path_not_exists(location)
+                makedir_if_path_not_exists(location)
 
                 # Time
                 location = os.path.join(location, attribute_values['DATE_ACQUIRED'])
-                # makedir_if_path_not_exists(location)
+                makedir_if_path_not_exists(location)
 
                 # DatasetType
                 location = os.path.join(location, filename[0:filename.index('_')])
-                # makedir_if_path_not_exists(location)
+                makedir_if_path_not_exists(location)
 
                 # Filter
                 if is_filter_enabled == True:
@@ -232,11 +232,13 @@ def organize_images(is_filter_enabled, cloudcover=None):
                         location = os.path.join(location, "DEFAULT FILTER")
                 else:
                     location = os.path.join(location, "NO FILTER")
-                # makedir_if_path_not_exists(location)
+                makedir_if_path_not_exists(location)
 
                 print("Moving data...")
-                shutil.copytree(root, location)
+                for copiedFiles in files:
+                    shutil.copy2(os.path.join(root, copiedFiles), location)
                 shutil.rmtree(root)
+                os.mkdir(root)
                 print("...Completed moving data")
 
 def log(location, info):
@@ -461,7 +463,7 @@ def main():
                         print(url)
                         if os.path.exists(lsdestdir):
                             print('product %s already downloaded and unzipped' % product_id)
-                            isFilterEnabled = options.cloud != None
+                            isFilterEnabled = options.clouds != None
                             organize_images(isFilterEnabled, options.clouds)
                             check = 0
                         elif os.path.isfile(tgzfile):
@@ -471,7 +473,7 @@ def main():
                                 if p == 1 and options.clouds != None:
                                     check = check_cloud_limit(lsdestdir, options.clouds)
                                 if check == 1:
-                                    isFilterEnabled = options.cloud != None
+                                    isFilterEnabled = options.clouds != None
                                     organize_images(isFilterEnabled, options.clouds)
                         else:
                             try:
@@ -546,11 +548,12 @@ def main():
                                     date_asc+station+version
                                 tgzfile = os.path.join(location, product_id+'.tgz')
                                 lsdestdir = os.path.join(location, product_id)
+                                print(lsdestdir)
                                 url = "https://earthexplorer.usgs.gov/download/%s/%s/STANDARD/EE" % (repert, product_id)
                                 print(url)
                                 if os.path.exists(lsdestdir):
                                     print('product %s already downloaded and unzipped' % product_id)
-                                    isFilterEnabled = options.cloud != None
+                                    isFilterEnabled = options.clouds != None
                                     organize_images(isFilterEnabled, options.clouds)
                                     check = 0
                                 elif os.path.isfile(tgzfile):
@@ -560,7 +563,7 @@ def main():
                                         if p == 1 and cloudcover != None:
                                             check = check_cloud_limit(lsdestdir, cloudcover)
                                         if check == 1:
-                                            isFilterEnabled = options.cloud != None
+                                            isFilterEnabled = options.clouds != None
                                             organize_images(isFilterEnabled, options.clouds)
                                 else:
                                     try:
@@ -584,5 +587,5 @@ def main():
 
 
 if __name__ == "__main__":
-    organize_images(True, cloudcover=None)
-    # main()        
+    # organize_images(True, cloudcover=None)
+    main()        

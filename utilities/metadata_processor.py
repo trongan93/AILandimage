@@ -25,16 +25,19 @@ def read_cloudcover_in_metadata(image_path):
     fields = ['CLOUD_COVER']
     cloud_cover = 0
 
-    imagename = os.path.basename(os.path.normpath(image_path))
-    metadatafile = os.path.join(image_path, imagename+'_MTL.txt')
-    with open(metadatafile, 'r') as metadata:
-        # metadata.replace('\r','')
-        for line in metadata:
-            line = line.replace('\r', '')
-            for f in fields:
-                if line.find(f) >= 0:
-                    lineval = line[line.find('= ')+2:]
-                    cloud_cover = lineval.replace('\n', '')
+    print(image_path)
+    for filename in os.listdir(image_path):
+        if filename.endswith('_MTL.txt'):
+            metadatafile = image_path
+            with open(metadatafile, 'r') as metadata:
+                # metadata.replace('\r','')
+                for line in metadata:
+                    line = line.replace('\r', '')
+                    for f in fields:
+                        if line.find(f) >= 0:
+                            lineval = line[line.find('= ')+2:]
+                            cloud_cover = lineval.replace('\n', '')
+    
     return float(cloud_cover)
 
 # "Check cloud cover limit
