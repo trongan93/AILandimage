@@ -1,5 +1,15 @@
 from enum import Enum
 
+# Because there are many dataset, each dataset has a different field name in the
+# metadata file
+# This enum class is the model for mapping between user defined general name
+# and the actual field name from metadata file
+class METADATA_FIELD_GENERAL_NAME(Enum):
+    WRS_PATH = 'WRS_PATH',
+    WRS_ROW = 'WRS_ROW',
+    CLOUDCOVER = 'CLOUDCOVER'
+    DATE_ACQUIRED = 'DATE_ACQUIRED'
+
 class DatasetType(Enum):
     LANDSAT8_OLI_TIRS_C1_LEVEL1 = 'LC8'
     LANDSAT7_ETM_C1_LEVEL1 = 'LE7'

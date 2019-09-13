@@ -28,6 +28,7 @@ from utilities.option_condition_check import *
 from utilities.earthexplorer_connector import *
 from utilities.metadata_processor import *
 from utilities.parser import *
+from utilities.mapper import *
 
 def sizeof_fmt(num):
     for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
@@ -206,14 +207,35 @@ def makedir_if_path_not_exists(path):
     if not(os.path.exists(path)):
         os.mkdir(path)
 
+def get_valid_metadata_field_names_based_on_satellite(satellite):
+    attribute_names = ['DATE_ACQUIRED']
+    if satellite == 'LE07':
+        attribute_names.extend(['WRS_PATH', 'WRS_ROW', 'CLOUD_COVER'])
+    elif satellite == 'LC08':
+        attribute_names.extend(['TARGET_WRS_PATH', 'TARGET_WRS_ROW', 'CLOUDCOVER'])
+    elif satellite == 'LT05':
+        attribute_names.extend(['WRS_PATH', 'WRS_ROW', 'CLOUD_COVER'])
+
+    return attribute_names
+
+def get_general_field_name_from_mapper(mapper, satellite, general_name):
+    return mapper[(satellite, general_name)]
+
 def organize_images(is_filter_enabled, cloudcover=None):
+    mapper = map_metadata_fieldname_to_general_name()
+
     for root, dirs, files in os.walk(os.path.join(DOWNLOADED_BASE_PATH, 'tmp')):
         for filename in files:
             if filename.endswith("_MTL.txt"):
-                attribute_values = read_attributes_in_metadata(os.path.join(root, filename), ['DATE_ACQUIRED', 'TARGET_WRS_PATH', 'TARGET_WRS_ROW', 'CLOUDCOVER'])
+                satellite = parse_satellite_from_downloaded_filename(filename)
+                attribute_names = get_valid_metadata_field_names_based_on_satellite(satellite)
 
+                attribute_values = read_attributes_in_metadata(os.path.join(root, filename), attribute_names)
+
+                path = str(attribute_values[get_general_field_name_from_mapper(mapper, satellite, 'WRS_PATH')]).zfill(3)
+                row = str(attribute_values[get_general_field_name_from_mapper(mapper, satellite, 'WRS_ROW')]).zfill(3)
                 # Location
-                location = os.path.join(IMAGE_BASE_PATH, str(attribute_values['TARGET_WRS_PATH']).zfill(3) + str(attribute_values['TARGET_WRS_ROW']).zfill(3))
+                location = os.path.join(IMAGE_BASE_PATH, path + row)
                 makedir_if_path_not_exists(location)
 
                 # Time
@@ -221,7 +243,7 @@ def organize_images(is_filter_enabled, cloudcover=None):
                 makedir_if_path_not_exists(location)
 
                 # DatasetType
-                location = os.path.join(location, filename[0:filename.index('_')])
+                location = os.path.join(location, parse_satellite_from_downloaded_filename(filename))
                 makedir_if_path_not_exists(location)
 
                 # Filter
@@ -437,7 +459,7 @@ def main():
 
             (repert, stations) = get_repert_and_stations(satellite)
 
-            if options.station != None:
+            if options.station != None and str(options.station).upper() != 'ALL': 
                 stations = [options.station]
             if options.dir != None:
                 repert = options.dir
@@ -529,7 +551,7 @@ def main():
 
                     (repert, stations) = get_repert_and_stations(satellite)
 
-                    if station != None:
+                    if station != None and station != 'ALL':
                         stations = [station]
 
                     check = 1

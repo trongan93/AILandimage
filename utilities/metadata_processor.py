@@ -6,10 +6,9 @@ import datetime
 
 def read_attributes_in_metadata(metadatafile, attribute_names):
     """
-    attributes: array of attributes
+    Read attributes from metadata file
     """
     attribute_values = dict()
-    
     with open(metadatafile, 'r') as metadata:
         for line in metadata:
             line = line.replace('\r', '')
@@ -17,7 +16,7 @@ def read_attributes_in_metadata(metadatafile, attribute_names):
                 if line.find(name) >= 0:
                     lineval = line[line.find('= ')+2:]
                     lineval = lineval.replace('\n', '')
-                    attribute_values[name] = lineval
+                    attribute_values[name] = (lineval)
 
     return attribute_values
 
@@ -28,7 +27,8 @@ def read_cloudcover_in_metadata(image_path):
     print(image_path)
     for filename in os.listdir(image_path):
         if filename.endswith('_MTL.txt'):
-            metadatafile = image_path
+            metadatafile = os.path.join(image_path, filename)
+            print(metadatafile)
             with open(metadatafile, 'r') as metadata:
                 # metadata.replace('\r','')
                 for line in metadata:
