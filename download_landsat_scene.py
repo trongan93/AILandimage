@@ -250,9 +250,9 @@ def organize_images(is_filter_enabled, cloudcover=None):
                     if cloudcover != None:
                         location = os.path.join(location, "CLOUDCOVER")
                     else:
-                        location = os.path.join(location, "DEFAULT FILTER")
+                        location = os.path.join(location, "DEFAULT_FILTER")
                 else:
-                    location = os.path.join(location, "NO FILTER")
+                    location = os.path.join(location, "NO_FILTER")
                 makedir_if_path_not_exists(location)
 
                 print("Moving data...")
