@@ -45,6 +45,7 @@ def read_cloudcover_in_metadata(image_path):
 def check_cloud_limit(imagepath, limit):
     removed = 0
     cloudcover = read_cloudcover_in_metadata(imagepath)
+    print(cloudcover)
     if cloudcover > limit:
         shutil.rmtree(imagepath)
         print("Image was removed because the cloud cover value of " +

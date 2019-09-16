@@ -18,7 +18,6 @@ import datetime
 import csv
 import re
 import json
-import pandas as pd
 
 from constants import *
 from convert_to_wrs import ConvertToWRS
@@ -575,18 +574,18 @@ def main():
                                 print(url)
                                 if os.path.exists(lsdestdir):
                                     print('product %s already downloaded and unzipped' % product_id)
-                                    isFilterEnabled = options.clouds != None
-                                    organize_images(isFilterEnabled, options.clouds)
+                                    isFilterEnabled = cloudcover != None
+                                    organize_images(isFilterEnabled, cloudcover)
                                     check = 0
                                 elif os.path.isfile(tgzfile):
                                     print('product %s already downloaded' % product_id)
                                     if unzip != None:
                                         p = unzipimage(product_id, location)
-                                        if p == 1 and cloudcover != None:
-                                            check = check_cloud_limit(lsdestdir, cloudcover)
+                                        if p == 1 and cloudcover != None and cloudcover != "":
+                                            check = check_cloud_limit(lsdestdir, float(cloudcover))
                                         if check == 1:
-                                            isFilterEnabled = options.clouds != None
-                                            organize_images(isFilterEnabled, options.clouds)
+                                            isFilterEnabled = cloudcover != None
+                                            organize_images(isFilterEnabled, cloudcover)
                                 else:
                                     try:
                                         downloadChunks(url, "%s" % location, product_id+'.tgz')
@@ -595,8 +594,8 @@ def main():
                                         notfound = True
                                     if notfound != True and options.unzip != None:
                                         p = unzipimage(product_id, location)
-                                        if p == 1 and options.clouds != None:
-                                            check = check_cloud_limit(lsdestdir, cloudcover)
+                                        if p == 1 and cloudcover != None and cloudcover != "":
+                                            check = check_cloud_limit(lsdestdir, float(cloudcover))
                 
                 with open(backupf, 'a') as backup:
                     writer = csv.writer(backup)

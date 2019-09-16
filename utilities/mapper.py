@@ -4,9 +4,9 @@ def map_metadata_fieldname_to_general_name():
     """
     mapper = dict()
     
-    mapper[('LC08', 'WRS_PATH')] = 'TARGET_WRS_PATH'
-    mapper[('LC08', 'WRS_ROW')] = 'TARGET_WRS_ROW'
-    mapper[('LC08', 'CLOUDCOVER')] = 'CLOUDCOVER'
+    mapper[('LC08', 'WRS_PATH')] = 'WRS_PATH'
+    mapper[('LC08', 'WRS_ROW')] = 'WRS_ROW'
+    mapper[('LC08', 'CLOUDCOVER')] = 'CLOUD_COVER'
 
     mapper[('LE07', 'WRS_PATH')] = 'WRS_PATH'
     mapper[('LE07', 'WRS_ROW')] = 'WRS_ROW'
