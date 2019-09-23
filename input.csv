@@ -1,3 +1,4 @@
-lat,lng,start_date,end_date,cloudcover,unzip,satellite,station
-37.234332396,-115.80666344,20110201,20110215,,true,LT5,ALL
-37.234332396,-115.80666344,20110201,20110215,,false,LT5,ALL
+lat,lng,start_date,end_date,cloudcover,satellite,station,downloaded_path
+37.234332396,-115.80666344,20110201,20110215,,LT5,ALL,/home/trainer1234/research/AILandImage/AILandimage/downloaded_files/Images/040034/2011-02-10/LT05/CLOUDCOVER;
+37.234332396,-115.80666344,20190801,20190829,,LC8,ALL,/home/trainer1234/research/AILandImage/AILandimage/downloaded_files/Images/040034/2019-08-11/LC08/CLOUDCOVER;/home/trainer1234/research/AILandImage/AILandimage/downloaded_files/Images/040034/2019-08-27/LC08/CLOUDCOVER;
+37.234332396,-115.80666344,20190901,20190909,,LE7,ALL,/home/trainer1234/research/AILandImage/AILandimage/downloaded_files/Images/040034/2019-09-04/LE07/CLOUDCOVER;
