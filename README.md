@@ -58,8 +58,9 @@ and the downloaded_path column in the input.csv file is appended with a new path
 Example: /home/test1/data/downloaded_files/Images/040034/2019-08-27/LC08/CLOUDCOVER;/home/test1/data/downloaded_files/Images/040034/2019-08-28/LC08/CLOUDCOVER
 
 (1) Each satellite (LC8, LT7, LE5) has their supported stations given in this table below:
-| Satellite     | Stations                |
-| ---           | ---                     |
-| LC8           | LGN                     |
-| LT7           | EDC, SGS, AGS, ASN, SG1 |
+
+| Satellite     | Stations                                                             |
+| ----------    | --------------------                                                 |
+| LC8           | LGN                                                                  |
+| LT7           | EDC, SGS, AGS, ASN, SG1                                              |
 | LE5           | ASN, GLC, ASA, KIR, MOR, KHC, PAC, KIS, CHM, LGS, MGR, COA, MPS, JSA |
