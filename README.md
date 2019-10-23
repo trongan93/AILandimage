@@ -57,6 +57,10 @@ After downloading an image at DOWNLOADED_BASE_PATH folder, the image will be mov
 and the downloaded_path column in the input.csv file is appended with a new path to the new image's folder. All paths will be concatenated to a string separated by a semicolon (;)
 Example: /home/test1/data/downloaded_files/Images/040034/2019-08-27/LC08/CLOUDCOVER;/home/test1/data/downloaded_files/Images/040034/2019-08-28/LC08/CLOUDCOVER
 
+To redownload the LANDSAT data:
+1. Remove the value from downloaded_path column in input.csv file
+2. Remove the sub-folders, files corresponded to the row to redownload in input.csv file. The sub-folders are located in a folder defined by DOWNLOADED_BASE_PATH variable in constants.py file
+
 (1) Each satellite (LC8, LT7, LE5) has their supported stations given in this table below:
 
 | Satellite     | Stations                                                             |
