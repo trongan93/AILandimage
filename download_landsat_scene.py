@@ -186,6 +186,8 @@ def move_images_after_downloaded(lsdestdir, is_filter_enabled, cloudcover=None):
     for root, dirs, files in os.walk(lsdestdir):
         for filename in files:
             if filename.endswith("_MTL.txt"):
+                cloudcover_percent = read_cloudcover_in_metadata(filename)
+
                 satellite = parse_satellite_from_downloaded_filename(filename)
                 attribute_names = get_valid_metadata_field_names_based_on_satellite(satellite)
 
@@ -205,14 +207,9 @@ def move_images_after_downloaded(lsdestdir, is_filter_enabled, cloudcover=None):
                 location = os.path.join(location, parse_satellite_from_downloaded_filename(filename))
                 makedir_if_path_not_exists(location)
 
-                # Filter
-                if is_filter_enabled == True:
-                    if cloudcover != None:
-                        location = os.path.join(location, "CLOUDCOVER")
-                    else:
-                        location = os.path.join(location, "DEFAULT_FILTER")
-                else:
-                    location = os.path.join(location, "NO_FILTER")
+                # Filter (CLOUDCOVER_PERCENT)
+                filter_folder_name = f"{str(int(cloudcover_percent))}"
+                location = os.path.join(location, filter_folder_name)
                 makedir_if_path_not_exists(location)
 
                 print("Moving data...")
@@ -305,7 +302,8 @@ def download_scene(input_file, csv_data):
 
     usgs = read_usgs_credential_file()
     wrs_converter = ConvertToWRS(WRS_SHAPE_FILE_PATH)
-
+    
+    id = csv_data["id"]
     lat = float(csv_data["lat"])
     lng = float(csv_data["lng"])
     start_date = str(csv_data["start_date"])
@@ -313,9 +311,10 @@ def download_scene(input_file, csv_data):
     satellite = csv_data["satellite"]
     station = csv_data["station"]
     cloudcover = csv_data["cloudcover"]
+    size = csv_data["size"]
     downloaded_path = csv_data["downloaded_path"]
     
-    print(lat, lng, start_date, end_date, satellite, station, cloudcover, downloaded_path)
+    print(id, lat, lng, start_date, end_date, size, satellite, station, cloudcover, downloaded_path)
     if downloaded_path != None and downloaded_path != "":
         print("Images already downloaded. Here is the path to image's folder")
         paths = downloaded_path.split(';')
@@ -363,12 +362,16 @@ def download_scene(input_file, csv_data):
                     product_id = satellite + \
                         str(path).zfill(3)+str(row).zfill(3) + \
                         date_asc+station+version
+                    
+                    tgzfile = os.path.join(location, product_id + '.tgz')
                     lsdestdir = os.path.join(location, product_id)
                     print(lsdestdir)
                     if (os.path.exists(lsdestdir)):
                         print("product already downloaded and unzipped.")
                         break
-                    
+                    elif (os.path.exists(tgzfile)):
+                        print("product already downloaded")
+
                     url = "https://earthexplorer.usgs.gov/download/%s/%s/STANDARD/EE" % (repert, product_id)
                     print(url)
 
