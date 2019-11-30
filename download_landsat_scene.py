@@ -186,8 +186,6 @@ def move_images_after_downloaded(lsdestdir, is_filter_enabled, cloudcover=None):
     for root, dirs, files in os.walk(lsdestdir):
         for filename in files:
             if filename.endswith("_MTL.txt"):
-                cloudcover_percent = read_cloudcover_in_metadata(filename)
-
                 satellite = parse_satellite_from_downloaded_filename(filename)
                 attribute_names = get_valid_metadata_field_names_based_on_satellite(satellite)
 
@@ -195,6 +193,7 @@ def move_images_after_downloaded(lsdestdir, is_filter_enabled, cloudcover=None):
 
                 path = str(attribute_values[get_general_field_name_from_mapper(mapper, satellite, 'WRS_PATH')]).zfill(3)
                 row = str(attribute_values[get_general_field_name_from_mapper(mapper, satellite, 'WRS_ROW')]).zfill(3)
+                cloudcover_percent = float(attribute_values[get_general_field_name_from_mapper(mapper, satellite, 'CLOUD_COVER')])
                 # Location
                 location = os.path.join(IMAGE_BASE_PATH, path + row)
                 makedir_if_path_not_exists(location)
@@ -385,7 +384,7 @@ def download_scene(input_file, csv_data):
                         p = unzipimage(product_id, location)
                         if p == 1 and cloudcover != None and cloudcover != "":
                             check = check_cloud_limit(lsdestdir, float(cloudcover))
-                        if check == 1:
+                        if check == 0:
                             isFilterEnabled = cloudcover != None
 
                             image_location = move_images_after_downloaded(lsdestdir, isFilterEnabled, cloudcover)
