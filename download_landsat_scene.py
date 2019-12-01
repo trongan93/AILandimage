@@ -193,7 +193,7 @@ def move_images_after_downloaded(lsdestdir, is_filter_enabled, cloudcover=None):
 
                 path = str(attribute_values[get_general_field_name_from_mapper(mapper, satellite, 'WRS_PATH')]).zfill(3)
                 row = str(attribute_values[get_general_field_name_from_mapper(mapper, satellite, 'WRS_ROW')]).zfill(3)
-                cloudcover_percent = float(attribute_values[get_general_field_name_from_mapper(mapper, satellite, 'CLOUD_COVER')])
+                cloudcover_percent = float(attribute_values[get_general_field_name_from_mapper(mapper, satellite, 'CLOUDCOVER')])
                 # Location
                 location = os.path.join(IMAGE_BASE_PATH, path + row)
                 makedir_if_path_not_exists(location)
