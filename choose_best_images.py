@@ -1,4 +1,4 @@
-import csv
+import csv, shutil
 from constants import *
 from utilities.directory_helper import *
 
@@ -27,9 +27,18 @@ with open(inputf, "r") as f:
                         cloudcover_percent_min_index = index
             print(cloudcover_percent)
             print(cloudcover_percent_min_index)
-            print(paths[cloudcover_percent_min_index])
 
-            line["downloaded_path"] = '%s;' % paths[cloudcover_percent_min_index]
+            paths_to_be_kept = []
+            paths_to_be_kept.append(paths[cloudcover_percent_min_index])
+            paths.pop(cloudcover_percent_min_index)
+            print(paths_to_be_kept)
+
+            print('Removing useless images...')
+            for path in paths:
+                if path:
+                    shutil.rmtree(path)
+            print('All useless images removed')
+            line["downloaded_path"] = '%s;' % paths_to_be_kept[0]
         
         with open(inputf, "a") as a:
             writer = csv.writer(a)
