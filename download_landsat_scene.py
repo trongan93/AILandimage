@@ -348,7 +348,7 @@ def download_scene(input_file, csv_data):
         if station != None and station != 'ALL':
             stations = [station]
 
-        check = 1
+        check = 0
         
         curr_date = next_overpass(date_start, int(path), satellite)
         
