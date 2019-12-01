@@ -324,6 +324,7 @@ def download_scene(input_file, csv_data):
 
     wrs = wrs_converter.get_wrs(lat, lng)
     print(wrs)
+    image_locations = ""
     for cell in wrs:
         path = cell["path"]
         row = cell["row"]
@@ -350,8 +351,8 @@ def download_scene(input_file, csv_data):
         check = 1
         
         curr_date = next_overpass(date_start, int(path), satellite)
-        image_locations = ""
-        while (curr_date < date_end) and check == 1:
+        
+        while (curr_date < date_end) and check == 0:
             date_asc = curr_date.strftime("%Y%j")
             notfound = False
             print('Searching for images on (julian date): ' + date_asc + '...')
