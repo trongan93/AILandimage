@@ -34,3 +34,10 @@ class ImageAttribute(Enum):
 class PRODUCT_METADATA(Enum):
     NADIR_OFFNADIR = 'NADIR_OFFNADIR'
     DATE_ACQUIRED = 'DATE_ACQUIRED'
+
+class LANDSLIDE_IMPACT_SIZE(Enum):
+    VERY_SMALL = (200, 200)
+    SMALL = (300, 300)
+    MEDIUM = (400, 400)
+    LARGE = (500, 500)
+    VERY_LARGE = (600, 600)
