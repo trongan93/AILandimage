@@ -41,6 +41,6 @@ def crop_image_based_on_impact(path, impact, lng, lat):
 
     return img
 
-# lat 38.43660
-# lon -117.29791
-# crop_image_based_on_impact("/home/trainer1234/research/trunk/040034/2011-02-10/LT05/CLOUDCOVER/LT05_L1TP_040034_20110210_20160901_01_T1_B1.TIF", "VERY_LARGE", -116, 37)
+lat 38.43660
+lon -117.29791
+crop_image_based_on_impact("ssh://trongan93@163.22.21.146/mnt/d/ProjectData/Landsat/Images//040034/2011-02-10/LT05/CLOUDCOVER/LT05_L1TP_040034_20110210_20160901_01_T1_B1.TIF", "VERY_LARGE", -116, 37)
