@@ -49,7 +49,10 @@ lat,lng,start_date (yyyymmdd),end_date (yyyymmdd),cloudcover,satellite,station,d
 | downloaded_path | string         | leave this field blank if the row's image has not been downloaded, otherwise the value from this field will be a concatenated string separated by semicolon (;) |
 
 - To download satellite images based on location's data inputted to input.csv earlier, Run
-> python main.py
+> python main.py 1
+
+- Cropped and combine images by running
+> python main.py 2
 
 After downloading an image at DOWNLOADED_BASE_PATH folder, the image will be moved to IMAGE_BASE_PATH folder with the following structure:
 /location/date/satellite/filter

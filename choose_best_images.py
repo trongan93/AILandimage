@@ -13,7 +13,7 @@ with open(inputf, "r") as f:
         writer.writerow(['id','lat','lng','start_date','end_date','size','cloudcover','satellite','station','downloaded_path'])
 
     for line in input_csv:
-        if line["downloaded_path"] != None and line["downloaded_path"] != '':
+        if line["downloaded_path"] != None and line["downloaded_path"] != '' and line["downloaded_path"] != "NODATA":
             # print(line)
             cloudcover_percent = float(line["cloudcover"])
             cloudcover_percent_min_index = 0
