@@ -314,7 +314,7 @@ def download_scene(input_file, csv_data):
     downloaded_path = csv_data["downloaded_path"]
     
     print(id, lat, lng, start_date, end_date, size, satellite, station, cloudcover, downloaded_path)
-    if downloaded_path === "NO DATA":
+    if downloaded_path == "NODATA":
         print("Found no image data")
         return 0
     
@@ -397,7 +397,7 @@ def download_scene(input_file, csv_data):
                                 image_locations += '%s;' % image_location
                             # organize_images(isFilterEnabled, cloudcover)
     
-    if image_locations === "":
-        image_locations = "NO DATA"
+    if image_locations == "":
+        image_locations = "NODATA"
     return image_locations
 
