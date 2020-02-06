@@ -314,6 +314,10 @@ def download_scene(input_file, csv_data):
     downloaded_path = csv_data["downloaded_path"]
     
     print(id, lat, lng, start_date, end_date, size, satellite, station, cloudcover, downloaded_path)
+    if downloaded_path === "NO DATA":
+        print("Found no image data")
+        return 0
+    
     if downloaded_path != None and downloaded_path != "":
         print("Images already downloaded. Here is the path to image's folder")
         paths = downloaded_path.split(';')
@@ -393,5 +397,7 @@ def download_scene(input_file, csv_data):
                                 image_locations += '%s;' % image_location
                             # organize_images(isFilterEnabled, cloudcover)
     
+    if image_locations === "":
+        image_locations = "NO DATA"
     return image_locations
 
