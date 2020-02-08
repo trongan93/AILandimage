@@ -28,16 +28,16 @@ def crop_image_based_on_impact(path, impact, lng, lat):
         print("Lat lng out of range")
         return
 
-    print("Row: ", row)
-    print("Col: ", col)
-    print("Pixel value: ", img[row][col])
+    # print("Row: ", row)
+    # print("Col: ", col)
+    # print("Pixel value: ", img[row][col])
 
     impact_size = get_impact_size(impact)    
     img = get_rect(img, row, col, impact_size)
 
     print(img.shape)
-    plt.imshow(img)
-    plt.show()
+    # plt.imshow(img)
+    # plt.show()
 
     return img
 

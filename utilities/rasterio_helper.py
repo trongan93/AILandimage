@@ -24,8 +24,8 @@ def lnglat_to_spatial_coors(lng, lat, crs=DEFAULT_CRS):
 
 def lnglat_to_image_coors(path, lng, lat):
     with rasterio.open(path) as src:
-        print(lng)
-        print(lat)
+        # print(lng)
+        # print(lat)
         east, north = lnglat_to_spatial_coors(lng, lat, src.crs)
         row, col = src.index(east, north)
 
