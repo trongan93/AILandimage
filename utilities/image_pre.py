@@ -4,36 +4,81 @@ import matplotlib.pyplot as plt
 import numpy as np
 import rasterio
 
-def combine_bands(imgs_folder_path):
-    imgs = load_images_from_folder(imgs_folder_path)
+def combine_bands(imgs_folder_path, satellite):
+    imgs = load_images_from_folder(imgs_folder_path, satellite)
     return imgs
 def read_img_by_rasterio(folder, filename):
     dataset = rasterio.open(os.path.join(folder,filename))
     return dataset
 
-def load_images_from_folder(folder):
+def load_images_from_folder(folder, satellite):
     global blue_img, green_img, red_img
-    for filename in os.listdir(folder):
-        band_name = file_name_band(filename)
-        if band_name == "B2":
-            blue_img = cv2.imread(os.path.join(folder,filename),0)
-            blue_np = np.fromfile(os.path.join(folder,filename),dtype='uint8')
-            blue_dataset = read_img_by_rasterio(folder, filename)
-            print("img shape: ", blue_img.shape)
-            # print("blue dataset witdth: ", blue_dataset.width)
-            # print("blue dataset transform: \n", blue_dataset.transform)
-            # print("blue dataset bound: ", blue_dataset.bounds)
-            # print("Coordinate reference system (CRS): ", blue_dataset.crs)
-            # print("dataset indexes: ", blue_dataset.indexes)
+    if satellite == "LC8":
+        for filename in os.listdir(folder):
+            band_name = file_name_band(filename)
+            if band_name == "B2":
+                blue_img = cv2.imread(os.path.join(folder,filename),0)
+                blue_np = np.fromfile(os.path.join(folder,filename),dtype='uint8')
+                blue_dataset = read_img_by_rasterio(folder, filename)
+                print("img shape: ", blue_img.shape)
+                # print("blue dataset witdth: ", blue_dataset.width)
+                # print("blue dataset transform: \n", blue_dataset.transform)
+                # print("blue dataset bound: ", blue_dataset.bounds)
+                # print("Coordinate reference system (CRS): ", blue_dataset.crs)
+                # print("dataset indexes: ", blue_dataset.indexes)
 
-        elif band_name == "B3":
-            green_img = cv2.imread(os.path.join(folder,filename),0)
-            green_np = np.fromfile(os.path.join(folder,filename),dtype='uint8')
-            green_dataset = read_img_by_rasterio(folder, filename)
-        elif band_name == "B4":
-            red_img = cv2.imread(os.path.join(folder,filename),0)
-            red_np = np.fromfile(os.path.join(folder,filename),dtype='uint8')
-            red_dataset = read_img_by_rasterio(folder, filename)
+            elif band_name == "B3":
+                green_img = cv2.imread(os.path.join(folder,filename),0)
+                green_np = np.fromfile(os.path.join(folder,filename),dtype='uint8')
+                green_dataset = read_img_by_rasterio(folder, filename)
+            elif band_name == "B4":
+                red_img = cv2.imread(os.path.join(folder,filename),0)
+                red_np = np.fromfile(os.path.join(folder,filename),dtype='uint8')
+                red_dataset = read_img_by_rasterio(folder, filename)
+    elif satellite == "LC7":
+        for filename in os.listdir(folder):
+            band_name = file_name_band(filename)
+            if band_name == "B1":
+                blue_img = cv2.imread(os.path.join(folder,filename),0)
+                blue_np = np.fromfile(os.path.join(folder,filename),dtype='uint8')
+                blue_dataset = read_img_by_rasterio(folder, filename)
+                print("img shape: ", blue_img.shape)
+                # print("blue dataset witdth: ", blue_dataset.width)
+                # print("blue dataset transform: \n", blue_dataset.transform)
+                # print("blue dataset bound: ", blue_dataset.bounds)
+                # print("Coordinate reference system (CRS): ", blue_dataset.crs)
+                # print("dataset indexes: ", blue_dataset.indexes)
+
+            elif band_name == "B2":
+                green_img = cv2.imread(os.path.join(folder,filename),0)
+                green_np = np.fromfile(os.path.join(folder,filename),dtype='uint8')
+                green_dataset = read_img_by_rasterio(folder, filename)
+            elif band_name == "B3":
+                red_img = cv2.imread(os.path.join(folder,filename),0)
+                red_np = np.fromfile(os.path.join(folder,filename),dtype='uint8')
+                red_dataset = read_img_by_rasterio(folder, filename)
+    elif satellite == "LT5":
+        for filename in os.listdir(folder):
+            band_name = file_name_band(filename)
+            if band_name == "B1":
+                blue_img = cv2.imread(os.path.join(folder,filename),0)
+                blue_np = np.fromfile(os.path.join(folder,filename),dtype='uint8')
+                blue_dataset = read_img_by_rasterio(folder, filename)
+                print("img shape: ", blue_img.shape)
+                # print("blue dataset witdth: ", blue_dataset.width)
+                # print("blue dataset transform: \n", blue_dataset.transform)
+                # print("blue dataset bound: ", blue_dataset.bounds)
+                # print("Coordinate reference system (CRS): ", blue_dataset.crs)
+                # print("dataset indexes: ", blue_dataset.indexes)
+
+            elif band_name == "B2":
+                green_img = cv2.imread(os.path.join(folder,filename),0)
+                green_np = np.fromfile(os.path.join(folder,filename),dtype='uint8')
+                green_dataset = read_img_by_rasterio(folder, filename)
+            elif band_name == "B3":
+                red_img = cv2.imread(os.path.join(folder,filename),0)
+                red_np = np.fromfile(os.path.join(folder,filename),dtype='uint8')
+                red_dataset = read_img_by_rasterio(folder, filename)
     rgb_img = cv2.merge([red_img,green_img,blue_img])
     return rgb_img
 

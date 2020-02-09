@@ -43,6 +43,7 @@ def main(choice):
                 lat = float(line["lat"])
                 lng = float(line["lng"])
                 size = str(line["size"])
+                satellite = str(line["satellite"])
                 downloaded_path = str(line["downloaded_path"])
 
                 if downloaded_path == None or downloaded_path == "" or downloaded_path == "NODATA":
@@ -54,9 +55,24 @@ def main(choice):
                 for dir in dirs:
                     cropped_folder = ""
                     
+                    # before_cropped = FileRawData(dir)
+                    # before_cropped_image = combine_bands(dir, satellite)
+                    # before_cropped_image = automatic_brightness_and_contrast(before_cropped_image)
+                    
+                    # before_cropped.save_feature_raw_image('before_cropped', before_cropped_image)
+                    # # plt.imshow(before_cropped_image)
+                    # # plt.show()
+
+                    # before_read_img = before_cropped.read_feature_raw_image('before_cropped', before_cropped_image.shape)
+                    # plt.imshow(read_img)
+                    # plt.show()
+
+                    filepath = os.path.join(dir, 'before_cropped')
+                    imageio.imsave(filepath + '.TIF', before_read_img)
+
                     band_files = []
                     for filename in os.listdir(dir):
-                        print(filename)
+                        # print(filename)
                         if filename.endswith(band_to_crop):
                             filepath = os.path.join(dir, filename)
                             rgb_img = crop_image_based_on_impact(filepath, size, lng, lat)
@@ -67,7 +83,7 @@ def main(choice):
 
                             cv2.imwrite(os.path.join(cropped_folder, f'cropped_{size}_{filename}'), rgb_img)
                     
-                    rgb_img = combine_bands(cropped_folder)
+                    rgb_img = combine_bands(cropped_folder, satellite)
                     rgb_img = rgb_img + 60
                     rgb_img = automatic_brightness_and_contrast(rgb_img)
                     # plt.imshow(rgb_img)
