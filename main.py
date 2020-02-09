@@ -53,7 +53,8 @@ def main(choice):
                 band_to_crop = ("B2.TIF", "B3.TIF", "B4.TIF") # B, G, R
                 for dir in dirs:
                     cropped_folder = ""
-
+                    
+                    band_files = []
                     for filename in os.listdir(dir):
                         print(filename)
                         if filename.endswith(band_to_crop):
@@ -62,25 +63,30 @@ def main(choice):
 
                             cropped_folder = os.path.join(dir, "cropped")
                             makedir_if_path_not_exists(cropped_folder)
+                            band_files.append(os.path.join(cropped_folder, f'cropped_{size}_{filename}'))
 
                             cv2.imwrite(os.path.join(cropped_folder, f'cropped_{size}_{filename}'), rgb_img)
-
+                    
                     rgb_img = combine_bands(cropped_folder)
                     rgb_img = rgb_img + 60
                     rgb_img = automatic_brightness_and_contrast(rgb_img)
                     # plt.imshow(rgb_img)
                     # plt.show()
                     
-                    filepath = os.path.join(cropped_folder, f'{size}_cropped')
+                    filename = f'{int(lat)}_{int(lng)}_{size}_cropped'
+                    filepath = os.path.join(cropped_folder, filename)
                     raw_data = FileRawData(cropped_folder)
-                    raw_data.save_feature_raw_image(f'{size}_cropped', rgb_img)
+                    raw_data.save_feature_raw_image(filename, rgb_img)
 
                     # cv2.imwrite(filepath, rgb_img)
-                    read_img = raw_data.read_feature_raw_image(f'{size}_cropped', rgb_img.shape)
+                    read_img = raw_data.read_feature_raw_image(filename, rgb_img.shape)
                     # plt.imshow(read_img)
                     # plt.show()
 
                     imageio.imsave(filepath + '.TIF', read_img)
+
+                    for band in band_files:
+                        os.remove(band)
         
 
 
