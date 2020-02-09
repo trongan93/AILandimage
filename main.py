@@ -4,6 +4,8 @@ from constants import *
 from utilities.image_pre import *
 from utilities.raw_image_file_data import *
 
+import imageio
+
 def main(choice):
     inputf = INPUT_FILE_PATH
     choice = int(choice)
@@ -68,38 +70,17 @@ def main(choice):
                     rgb_img = automatic_brightness_and_contrast(rgb_img)
                     # plt.imshow(rgb_img)
                     # plt.show()
-                    # filepath = os.path.join(cropped_folder, f'{size}_cropped')
+                    
+                    filepath = os.path.join(cropped_folder, f'{size}_cropped')
                     raw_data = FileRawData(cropped_folder)
                     raw_data.save_feature_raw_image(f'{size}_cropped', rgb_img)
 
                     # cv2.imwrite(filepath, rgb_img)
-                    # read_img = raw_data.read_feature_raw_image(f'{size}_cropped', rgb_img.shape)
+                    read_img = raw_data.read_feature_raw_image(f'{size}_cropped', rgb_img.shape)
                     # plt.imshow(read_img)
                     # plt.show()
-    # Convert blank downloaded_path on server 2's data to "NODATA" value
-    # Will remove later
-    elif choice == 3:
-        with open(inputf, "r") as f:
-            input_csv = csv.DictReader(f, delimiter=',')
 
-            os.remove(inputf)
-
-            # create csv header
-            with open(inputf, 'a') as a:
-                writer = csv.writer(a)
-                writer.writerow(['id','lat','lng','start_date','end_date','size','cloudcover','satellite','station','downloaded_path'])
-            
-            for line in input_csv:
-                downloaded_path = line["downloaded_path"]
-                
-                if downloaded_path == None or downloaded_path == "":
-                    line["downloaded_path"] = "NODATA"
-
-                with open(inputf, "a") as a:
-                    writer = csv.writer(a)
-                    writer.writerow(line.values())
-
-
+                    imageio.imsave(filepath + '.TIF', read_img)
         
 
 
