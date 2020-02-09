@@ -49,7 +49,7 @@ def main(choice):
                     continue
 
                 dirs = downloaded_path.split(';')
-                
+                dirs.remove('')
                 band_to_crop = ("B2.TIF", "B3.TIF", "B4.TIF") # B, G, R
                 for dir in dirs:
                     cropped_folder = ""
