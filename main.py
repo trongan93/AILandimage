@@ -52,6 +52,10 @@ def main(choice):
                 dirs = downloaded_path.split(';')
                 dirs.remove('')
                 band_to_crop = ("B2.TIF", "B3.TIF", "B4.TIF") # B, G, R
+                if satellite == "LE7" or satellite == "LT5":
+                    band_to_crop = ("B1.TIF", "B2.TIF", "B3.TIF")
+                elif satellite == "LC8":
+                    band_to_crop = ("B2.TIF", "B3.TIF", "B4.TIF") # B, G, R
                 for dir in dirs:
                     cropped_folder = ""
                     
