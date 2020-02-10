@@ -55,15 +55,15 @@ def main(choice):
                 for dir in dirs:
                     cropped_folder = ""
                     
-                    # before_cropped = FileRawData(dir)
-                    # before_cropped_image = combine_bands(dir, satellite)
-                    # before_cropped_image = automatic_brightness_and_contrast(before_cropped_image)
+                    before_cropped = FileRawData(dir)
+                    before_cropped_image = combine_bands(dir, satellite)
+                    before_cropped_image = automatic_brightness_and_contrast(before_cropped_image)
                     
-                    # before_cropped.save_feature_raw_image('before_cropped', before_cropped_image)
+                    before_cropped.save_feature_raw_image('before_cropped', before_cropped_image)
                     # # plt.imshow(before_cropped_image)
                     # # plt.show()
 
-                    # before_read_img = before_cropped.read_feature_raw_image('before_cropped', before_cropped_image.shape)
+                    before_read_img = before_cropped.read_feature_raw_image('before_cropped', before_cropped_image.shape)
                     # plt.imshow(read_img)
                     # plt.show()
 

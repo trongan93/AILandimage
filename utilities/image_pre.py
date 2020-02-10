@@ -35,7 +35,7 @@ def load_images_from_folder(folder, satellite):
                 red_img = cv2.imread(os.path.join(folder,filename),0)
                 red_np = np.fromfile(os.path.join(folder,filename),dtype='uint8')
                 red_dataset = read_img_by_rasterio(folder, filename)
-    elif satellite == "LC7":
+    elif satellite == "LE7":
         for filename in os.listdir(folder):
             band_name = file_name_band(filename)
             if band_name == "B1":
