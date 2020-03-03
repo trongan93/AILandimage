@@ -29,7 +29,7 @@ def main(choice):
                     line["downloaded_path"] = result
 
                 line["id"] = count
-                count += 1
+                # count += 1
 
                 with open(inputf, "a") as a:
                     writer = csv.writer(a)
@@ -39,6 +39,13 @@ def main(choice):
     elif choice == 2:
         with open(inputf, 'r') as f:
             input_csv = csv.DictReader(f, delimiter=',')
+            os.remove(inputf)
+
+            # create csv header
+            with open(inputf, 'a') as a:
+                writer = csv.writer(a)
+                writer.writerow(['id','lat','lng','start_date','end_date','size','cloudcover','satellite','station','downloaded_path'])
+
             for line in input_csv:
                 lat = float(line["lat"])
                 lng = float(line["lng"])
@@ -47,16 +54,25 @@ def main(choice):
                 downloaded_path = str(line["downloaded_path"])
 
                 if downloaded_path == None or downloaded_path == "" or downloaded_path == "NODATA":
+                    with open(inputf, "a") as a:
+                        writer = csv.writer(a)
+                        writer.writerow(line.values())
                     continue
 
                 dirs = downloaded_path.split(';')
                 dirs.remove('')
                 band_to_crop = ("B2.TIF", "B3.TIF", "B4.TIF") # B, G, R
-                if satellite == "LE7" or satellite == "LT5":
+                if satellite == "LE7":
+                    band_to_crop = ("B1.TIF", "B2.TIF", "B3.TIF")
+                elif satellite == "LT5":
                     band_to_crop = ("B1.TIF", "B2.TIF", "B3.TIF")
                 elif satellite == "LC8":
                     band_to_crop = ("B2.TIF", "B3.TIF", "B4.TIF") # B, G, R
+                final_paths = []
                 for dir in dirs:
+                    if not(os.path.exists(dir)):
+                        continue
+
                     cropped_folder = ""
                     
                     before_cropped = FileRawData(dir)
@@ -89,7 +105,15 @@ def main(choice):
                     
                     rgb_img = combine_bands(cropped_folder, satellite)
                     rgb_img = rgb_img + 60
-                    rgb_img = automatic_brightness_and_contrast(rgb_img)
+                    try:
+                        rgb_img = automatic_brightness_and_contrast(rgb_img)
+                    except:
+                        if float(line["cloudcover"]) > 90:
+                            print("Cloudcover too high, remove images")
+                            shutil.rmtree(dir)
+                        else:
+                            print("Something wrong")
+                        continue
                     # plt.imshow(rgb_img)
                     # plt.show()
                     
@@ -107,6 +131,14 @@ def main(choice):
 
                     for band in band_files:
                         os.remove(band)
+                    final_paths.append(dir)
+                if final_paths == []:
+                    line["downloaded_path"] = "NODATA"
+                else:
+                    line["downloaded_path"] = ';'.join(final_paths) + ";"
+                with open(inputf, "a") as a:
+                    writer = csv.writer(a)
+                    writer.writerow(line.values())
         
 
 
