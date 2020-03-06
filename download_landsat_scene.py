@@ -26,6 +26,10 @@ from utilities.metadata_processor import *
 from utilities.parser import *
 from utilities.mapper import *
 
+from landsatxplore.api import *
+from landsatxplore.earthexplorer import *
+from landsatxplore.util import *
+
 def sizeof_fmt(num):
     for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
         if num < 1024.0:
@@ -401,3 +405,133 @@ def download_scene(input_file, csv_data):
         image_locations = "NODATA"
     return image_locations
 
+
+def map_dataset(satellite):
+    mapper = {
+        "LC8": "LANDSAT_8_C1",
+        "LE7": "LANDSAT_ETM_C1",
+        "LT5": "LANDSAT_TM_C1",
+        "LANDSAT_8_C1": "LC8",
+        "LANDSAT_ETM_C1": "LE7",
+        "LANDSAT_TM_C1": "LT5"
+    }
+    return mapper[satellite]
+
+def get_wrs(entity_id):
+    path = entity_id[3:6]
+    row = entity_id[6:9]
+    return { path: path, row: row }
+
+def download_scene_api(input_file, csv_data):
+    """ Download landsat scene with data from csv file
+    
+    Parameter:
+    input_file (string): The CSV file
+    csv_data (dict): Data from CSV file
+
+    Returns:
+    0 if the scenes are already downloaded
+    downloaded_paths (string) if the scenes are downloaded and stored 
+    (The downloaded_paths delimeter is a semicolon (;) )
+    """           
+    usgs = read_usgs_credential_file()
+    
+    id = csv_data["id"]
+    lat = float(csv_data["lat"])
+    lng = float(csv_data["lng"])
+    start_date = str(csv_data["start_date"])
+    end_date = str(csv_data["end_date"])
+    satellite = csv_data["satellite"]
+    station = csv_data["station"]
+    cloudcover = csv_data["cloudcover"]
+    size = csv_data["size"]
+    downloaded_path = csv_data["downloaded_path"]
+    
+    print(id, lat, lng, start_date, end_date, size, satellite, station, cloudcover, downloaded_path)
+    if downloaded_path != None and downloaded_path != "":
+        print("Images already downloaded. Here is the path to image's folder")
+        paths = downloaded_path.split(';')
+        for path in paths:
+            print(path)
+        return 0
+
+    date_start = parse_date(start_date)
+    if end_date != None:
+        date_end = parse_date(end_date)
+    else:
+        date_end = datetime.datetime.now()
+
+    api = API(usgs['account'], usgs['passwd'])
+    ee = EarthExplorer(usgs['account'], usgs['passwd'])
+
+    
+    dataset = map_dataset(satellite)
+
+    where = {'dataset': dataset}
+    where.update(latitude=lat, longitude=lng)
+    where.update(max_cloud_cover=cloudcover)
+    where.update(start_date=f'{date_start.year}-{date_start.month}-{date_start.day}')
+    where.update(end_date=f'{date_end.year}-{date_end.month}-{date_end.day}')
+
+    results = api.search(**where)
+    api.logout()
+
+    if not results:
+        return "NODATA"
+    
+    print(results)
+
+    (repert, stations) = get_repert_and_stations(satellite)
+
+    connect_earthexplorer_no_proxy(usgs)
+
+    image_locations = ""
+    for scene in results:
+        dump = json.dumps(results, indent=True)
+        print(dump)
+
+        entity_id = scene["entityId"]
+        download_url = scene["downloadUrl"]
+        scene_cloud_cover = scene["cloudCover"]
+        acquisition_date = scene["acquisitionDate"]
+        start_time = scene["startTime"]
+        end_time = scene["endTime"]
+
+        wrs = get_wrs(entity_id)
+
+        location = os.path.join(DOWNLOADED_BASE_PATH, 'tmp')
+        data_folder = os.path.join(DOWNLOADED_BASE_PATH, 'Images')     
+        makedir_if_path_not_exists(location)
+        makedir_if_path_not_exists(data_folder)
+
+        lsdestdir = os.path.join(location, entity_id)
+        tgzfile = os.path.join(location, entity_id + '.tgz')
+
+        print(lsdestdir)
+        if (os.path.exists(lsdestdir)):
+            print("product already downloaded and unzipped.")
+            break
+        elif (os.path.exists(tgzfile)):
+            print("product already downloaded")
+        
+        url = "https://earthexplorer.usgs.gov/download/%s/%s/STANDARD/EE" % (repert, entity_id)
+        print(url)
+
+        try:
+            downloadChunks(url, "%s" % location, entity_id+'.tgz')
+        except:
+            print('product %s not found' % entity_id)
+
+        p = unzipimage(entity_id, location)
+
+        check = 0
+        if p == 1 and cloudcover != None and cloudcover != "":
+            check = check_cloud_limit(lsdestdir, float(cloudcover))
+        if check == 0:
+            isFilterEnabled = cloudcover != None
+
+            image_location = move_images_after_downloaded(lsdestdir, isFilterEnabled, cloudcover)
+            if image_location != None:
+                image_locations += '%s;' % image_location
+            # organize_images(isFilterEnabled, cloudcover)
+    return image_locations

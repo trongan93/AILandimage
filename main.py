@@ -13,25 +13,22 @@ def main(choice):
     if choice == 1:
         with open(inputf, "r") as f:
             input_csv = csv.DictReader(f, delimiter=',')
+            inputs = list(input_csv)
+        os.remove(inputf)
 
-            os.remove(inputf)
-
-            # create csv header
-            with open(inputf, 'a') as a:
-                writer = csv.writer(a)
-                writer.writerow(['id','lat','lng','start_date','end_date','size','cloudcover','satellite','station','downloaded_path'])
-            
-            count = 0
-            for line in input_csv:
-                result = download_scene(inputf, line)
+        # create csv header
+        with open(inputf, 'a') as a:
+            writer = csv.writer(a)
+            writer.writerow(['id','lat','lng','start_date','end_date','size','cloudcover','satellite','station','downloaded_path'])
+        
+        with open(inputf, 'r') as f:
+            for line in inputs:
+                result = download_scene_api(inputf, line)
 
                 if str(result) != '0':
                     line["downloaded_path"] = result
 
-                line["id"] = count
-                # count += 1
-
-                with open(inputf, "a") as a:
+                with open(inputf, "a", newline='') as a:
                     writer = csv.writer(a)
                     writer.writerow(line.values())
      ### Created by trongan93 Nov 27th
@@ -39,14 +36,16 @@ def main(choice):
     elif choice == 2:
         with open(inputf, 'r') as f:
             input_csv = csv.DictReader(f, delimiter=',')
-            os.remove(inputf)
+            inputs = list(input_csv)
+        os.remove(inputf)
 
             # create csv header
-            with open(inputf, 'a') as a:
-                writer = csv.writer(a)
-                writer.writerow(['id','lat','lng','start_date','end_date','size','cloudcover','satellite','station','downloaded_path'])
-
-            for line in input_csv:
+        with open(inputf, 'a') as a:
+            writer = csv.writer(a)
+            writer.writerow(['id','lat','lng','start_date','end_date','size','cloudcover','satellite','station','downloaded_path'])
+        
+        with open(inputf, 'r') as f:
+            for line in inputs:
                 lat = float(line["lat"])
                 lng = float(line["lng"])
                 size = str(line["size"])
