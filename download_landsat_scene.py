@@ -7,6 +7,7 @@
 import os
 import sys
 import math
+import traceback
 import urllib
 import urllib.request
 import urllib.response
@@ -322,7 +323,7 @@ def download_scene(input_file, csv_data):
         print("Found no image data")
         return 0
     
-    if downloaded_path != None and downloaded_path != "":
+    if downloaded_path != None and downloaded_path.strip() != "":
         print("Images already downloaded. Here is the path to image's folder")
         paths = downloaded_path.split(';')
         for path in paths:
@@ -333,73 +334,84 @@ def download_scene(input_file, csv_data):
     wrs = wrs_converter.get_wrs(lat, lng)
     print(wrs)
     image_locations = ""
-    for cell in wrs:
-        path = cell["path"]
-        row = cell["row"]
+    try:
+        for cell in wrs:
+            path = cell["path"]
+            row = cell["row"]
 
-        date_start = parse_date(start_date)
+            date_start = parse_date(start_date)
 
-        if end_date != None:
-            date_end = parse_date(end_date)
-        else:
-            date_end = datetime.datetime.now()
+            if end_date != None:
+                date_end = parse_date(end_date)
+            else:
+                date_end = datetime.datetime.now()
 
-        connect_earthexplorer_no_proxy(usgs)
+            connect_earthexplorer_no_proxy(usgs)
 
-        location = os.path.join(DOWNLOADED_BASE_PATH, 'tmp')
-        data_folder = os.path.join(DOWNLOADED_BASE_PATH, 'Images')     
-        makedir_if_path_not_exists(location)
-        makedir_if_path_not_exists(data_folder)
+            location = os.path.join(DOWNLOADED_BASE_PATH, 'tmp')
+            data_folder = os.path.join(DOWNLOADED_BASE_PATH, 'Images')     
+            makedir_if_path_not_exists(location)
+            makedir_if_path_not_exists(data_folder)
 
-        (repert, stations) = get_repert_and_stations(satellite)
+            (repert, stations) = get_repert_and_stations(satellite)
 
-        if station != None and station != 'ALL':
-            stations = [station]
+            if station != None and station != 'ALL':
+                stations = [station]
 
-        check = 0
-        
-        curr_date = next_overpass(date_start, int(path), satellite)
-        
-        while (curr_date < date_end) and check == 0:
-            date_asc = curr_date.strftime("%Y%j")
-            notfound = False
-            print('Searching for images on (julian date): ' + date_asc + '...')
-            curr_date = curr_date+datetime.timedelta(16)
-            for station in stations:
-                for version in ['00', '01', '02']:
-                    product_id = satellite + \
-                        str(path).zfill(3)+str(row).zfill(3) + \
-                        date_asc+station+version
-                    
-                    tgzfile = os.path.join(location, product_id + '.tgz')
-                    lsdestdir = os.path.join(location, product_id)
-                    print(lsdestdir)
-                    if (os.path.exists(lsdestdir)):
-                        print("product already downloaded and unzipped.")
-                        break
-                    elif (os.path.exists(tgzfile)):
-                        print("product already downloaded")
+            check = 0
+            
+            curr_date = next_overpass(date_start, int(path), satellite)
+            
+            while (curr_date < date_end) and check == 0:
+                date_asc = curr_date.strftime("%Y%j")
+                notfound = False
+                print('Searching for images on (julian date): ' + date_asc + '...')
+                curr_date = curr_date+datetime.timedelta(16)
+                for station in stations:
+                    for version in ['00', '01', '02']:
+                        product_id = satellite + \
+                            str(path).zfill(3)+str(row).zfill(3) + \
+                            date_asc+station+version
+                        
+                        tgzfile = os.path.join(location, product_id + '.tgz')
+                        lsdestdir = os.path.join(location, product_id)
+                        print(lsdestdir)
+                        if (os.path.exists(lsdestdir)):
+                            print("product already downloaded and unzipped.")
+                        elif (os.path.exists(tgzfile)):
+                            print("product already downloaded")
 
-                    url = "https://earthexplorer.usgs.gov/download/%s/%s/STANDARD/EE" % (repert, product_id)
-                    print(url)
+                        url = "https://earthexplorer.usgs.gov/download/%s/%s/STANDARD/EE" % (repert, product_id)
+                        print(url)
 
-                    try:
-                        downloadChunks(url, "%s" % location, product_id+'.tgz')
-                    except:
-                        print('product %s not found' % product_id)
-                        notfound = True
+                        try:
+                            downloadChunks(url, "%s" % location, product_id+'.tgz')
+                        except:
+                            print('product %s not found' % product_id)
+                            notfound = True
 
-                    if notfound != True:
-                        p = unzipimage(product_id, location)
-                        if p == 1 and cloudcover != None and cloudcover != "":
-                            check = check_cloud_limit(lsdestdir, float(cloudcover))
-                        if check == 0:
-                            isFilterEnabled = cloudcover != None
+                        if notfound != True:
+                            p = unzipimage(product_id, location)
+                            if p == 1 and cloudcover != None and cloudcover != "":
+                                check = check_cloud_limit(lsdestdir, float(cloudcover))
+                            if check == 0:
+                                isFilterEnabled = cloudcover != None
 
-                            image_location = move_images_after_downloaded(lsdestdir, isFilterEnabled, cloudcover)
-                            if image_location != None:
-                                image_locations += '%s;' % image_location
-                            # organize_images(isFilterEnabled, cloudcover)
+                                image_location = move_images_after_downloaded(lsdestdir, isFilterEnabled, cloudcover)
+                                if image_location != None:
+                                    image_locations += '%s;' % image_location
+                                # organize_images(isFilterEnabled, cloudcover)
+    except KeyboardInterrupt:
+        print('Interrupted')
+        try:
+            sys.exit(0)
+        except SystemExit:
+            os._exit(0)
+    except:
+        traceback_exc = traceback.format_exc()
+        traceback_exc = ' '.join(traceback_exc.splitlines())
+        print(traceback_exc)
+        return f'Exception: {traceback_exc}'
     
     if image_locations == "":
         image_locations = "NODATA"
@@ -448,7 +460,7 @@ def download_scene_api(input_file, csv_data):
     downloaded_path = csv_data["downloaded_path"]
     
     print(id, lat, lng, start_date, end_date, size, satellite, station, cloudcover, downloaded_path)
-    if downloaded_path != None and downloaded_path != "":
+    if downloaded_path != None and downloaded_path.strip() != "":
         print("Images already downloaded. Here is the path to image's folder")
         paths = downloaded_path.split(';')
         for path in paths:
@@ -460,78 +472,92 @@ def download_scene_api(input_file, csv_data):
         date_end = parse_date(end_date)
     else:
         date_end = datetime.datetime.now()
-
-    api = API(usgs['account'], usgs['passwd'])
-    ee = EarthExplorer(usgs['account'], usgs['passwd'])
-
     
-    dataset = map_dataset(satellite)
-
-    where = {'dataset': dataset}
-    where.update(latitude=lat, longitude=lng)
-    where.update(max_cloud_cover=cloudcover)
-    where.update(start_date=f'{date_start.year}-{date_start.month}-{date_start.day}')
-    where.update(end_date=f'{date_end.year}-{date_end.month}-{date_end.day}')
-
-    results = api.search(**where)
-    api.logout()
-
-    if not results:
-        return "NODATA"
-    
-    print(results)
-
-    (repert, stations) = get_repert_and_stations(satellite)
-
-    connect_earthexplorer_no_proxy(usgs)
-
     image_locations = ""
-    for scene in results:
-        dump = json.dumps(results, indent=True)
-        print(dump)
-
-        entity_id = scene["entityId"]
-        download_url = scene["downloadUrl"]
-        scene_cloud_cover = scene["cloudCover"]
-        acquisition_date = scene["acquisitionDate"]
-        start_time = scene["startTime"]
-        end_time = scene["endTime"]
-
-        wrs = get_wrs(entity_id)
-
-        location = os.path.join(DOWNLOADED_BASE_PATH, 'tmp')
-        data_folder = os.path.join(DOWNLOADED_BASE_PATH, 'Images')     
-        makedir_if_path_not_exists(location)
-        makedir_if_path_not_exists(data_folder)
-
-        lsdestdir = os.path.join(location, entity_id)
-        tgzfile = os.path.join(location, entity_id + '.tgz')
-
-        print(lsdestdir)
-        if (os.path.exists(lsdestdir)):
-            print("product already downloaded and unzipped.")
-            break
-        elif (os.path.exists(tgzfile)):
-            print("product already downloaded")
+    try:
+        api = API(usgs['account'], usgs['passwd'])
+        # ee = EarthExplorer(usgs['account'], usgs['passwd'])
         
-        url = "https://earthexplorer.usgs.gov/download/%s/%s/STANDARD/EE" % (repert, entity_id)
-        print(url)
+        dataset = map_dataset(satellite)
 
+        where = {'dataset': dataset}
+        where.update(latitude=lat, longitude=lng)
+        where.update(max_cloud_cover=cloudcover)
+        where.update(start_date=f'{date_start.year}-{date_start.month}-{date_start.day}')
+        where.update(end_date=f'{date_end.year}-{date_end.month}-{date_end.day}')
+
+        results = api.search(**where)
+        api.logout()
+
+        if not results:
+            return "NODATA"
+        
+        print(results)
+
+        (repert, stations) = get_repert_and_stations(satellite)
+
+        connect_earthexplorer_no_proxy(usgs)
+
+        for scene in results:
+            dump = json.dumps(results, indent=True)
+            print(dump)
+
+            entity_id = scene["entityId"]
+            download_url = scene["downloadUrl"]
+            scene_cloud_cover = scene["cloudCover"]
+            acquisition_date = scene["acquisitionDate"]
+            start_time = scene["startTime"]
+            end_time = scene["endTime"]
+
+            wrs = get_wrs(entity_id)
+
+            location = os.path.join(DOWNLOADED_BASE_PATH, 'tmp')
+            data_folder = os.path.join(DOWNLOADED_BASE_PATH, 'Images')     
+            makedir_if_path_not_exists(location)
+            makedir_if_path_not_exists(data_folder)
+
+            lsdestdir = os.path.join(location, entity_id)
+            tgzfile = os.path.join(location, entity_id + '.tgz')
+
+            print(lsdestdir)
+            if (os.path.exists(lsdestdir)):
+                print("product already downloaded and unzipped. Re-download to make sure that the downloaded_path is populated correctly")
+            elif (os.path.exists(tgzfile)):
+                print("product already downloaded. Re-download to make sure that the downloaded_path is populated correctly")
+            
+            url = "https://earthexplorer.usgs.gov/download/%s/%s/STANDARD/EE" % (repert, entity_id)
+            print(url)
+
+            try:
+                downloadChunks(url, "%s" % location, entity_id+'.tgz')
+            except:
+                print('product %s not found' % entity_id)
+
+            p = unzipimage(entity_id, location)
+
+            check = 0
+            if p == 1 and cloudcover != None and cloudcover != "":
+                check = check_cloud_limit(lsdestdir, float(cloudcover))
+            if check == 0:
+                isFilterEnabled = cloudcover != None
+
+                image_location = move_images_after_downloaded(lsdestdir, isFilterEnabled, cloudcover)
+                if image_location != None:
+                    image_locations += '%s;' % image_location
+                # organize_images(isFilterEnabled, cloudcover)
+    except KeyboardInterrupt:
+        print('Interrupted')
         try:
-            downloadChunks(url, "%s" % location, entity_id+'.tgz')
-        except:
-            print('product %s not found' % entity_id)
-
-        p = unzipimage(entity_id, location)
-
-        check = 0
-        if p == 1 and cloudcover != None and cloudcover != "":
-            check = check_cloud_limit(lsdestdir, float(cloudcover))
-        if check == 0:
-            isFilterEnabled = cloudcover != None
-
-            image_location = move_images_after_downloaded(lsdestdir, isFilterEnabled, cloudcover)
-            if image_location != None:
-                image_locations += '%s;' % image_location
-            # organize_images(isFilterEnabled, cloudcover)
+            sys.exit(0)
+        except SystemExit:
+            os._exit(0)
+    except:
+        traceback_exc = traceback.format_exc()
+        traceback_exc = ' '.join(traceback_exc.splitlines())
+        print(traceback_exc)
+        return f'Exception: {traceback_exc}'
+    
+    if image_locations == "":
+        image_locations = "NODATA"
+    
     return image_locations
