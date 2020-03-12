@@ -32,6 +32,8 @@ def crop_image_based_on_impact(path, impact, lng, lat):
     # print("Col: ", col)
     # print("Pixel value: ", img[row][col])
 
+    if impact == 'Extra Large':
+        impact = 'EXTRA_LARGE'
     impact_size = get_impact_size(impact)    
     img = get_rect(img, row, col, impact_size)
 

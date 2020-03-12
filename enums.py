@@ -41,4 +41,5 @@ class LANDSLIDE_IMPACT_SIZE(Enum):
     MEDIUM = (450, 450)
     LARGE = (550, 550)
     VERY_LARGE = (650, 650)
-    UNKNOWN = (650, 650)
+    EXTRA_LARGE = (750, 750)
+    UNKNOWN = (750, 750)
