@@ -432,7 +432,7 @@ def map_dataset(satellite):
 def get_wrs(entity_id):
     path = entity_id[3:6]
     row = entity_id[6:9]
-    return { path: path, row: row }
+    return { "path": path, "row": row }
 
 def download_scene_api(input_file, csv_data):
     """ Download landsat scene with data from csv file
@@ -504,12 +504,14 @@ def download_scene_api(input_file, csv_data):
 
             entity_id = scene["entityId"]
             download_url = scene["downloadUrl"]
-            scene_cloud_cover = scene["cloudCover"]
+            scene_cloud_cover = str(int(scene["cloudCover"]))
             acquisition_date = scene["acquisitionDate"]
             start_time = scene["startTime"]
             end_time = scene["endTime"]
 
             wrs = get_wrs(entity_id)
+            print(wrs["path"])
+            print(wrs["row"])
 
             location = os.path.join(DOWNLOADED_BASE_PATH, 'tmp')
             data_folder = os.path.join(DOWNLOADED_BASE_PATH, 'Images')     
@@ -520,31 +522,61 @@ def download_scene_api(input_file, csv_data):
             tgzfile = os.path.join(location, entity_id + '.tgz')
 
             print(lsdestdir)
+            is_downloaded = False
+            is_unzipped = False
             if (os.path.exists(lsdestdir)):
-                print("product already downloaded and unzipped. Re-download to make sure that the downloaded_path is populated correctly")
+                print("product already downloaded and unzipped.")
+                is_downloaded = True
+                is_unzipped = True
             elif (os.path.exists(tgzfile)):
-                print("product already downloaded. Re-download to make sure that the downloaded_path is populated correctly")
+                print("product already downloaded")
+                is_downloaded = True
+                is_unzipped = False
             
-            url = "https://earthexplorer.usgs.gov/download/%s/%s/STANDARD/EE" % (repert, entity_id)
-            print(url)
+            if is_downloaded:
+                image_location = os.path.join(IMAGE_BASE_PATH, str(wrs["path"] + wrs["row"]), acquisition_date, satellite, scene_cloud_cover)
+                print(image_location)
 
-            try:
-                downloadChunks(url, "%s" % location, entity_id+'.tgz')
-            except:
-                print('product %s not found' % entity_id)
+                if is_unzipped:
+                    if os.path.exists(image_location):
+                        print(f"Image existed at {image_location}.")
+                        image_locations += '%s;' % image_location
+                        continue
+                    else:
+                        print(f"Image does not exist at {image_location}. Attempt to redownload.")
+                        is_downloaded = False
+                        is_unzipped = False
+                else:
+                    unzip_success = unzipimage(entity_id, location)
+                    if unzip_success == 1:
+                        isFilterEnabled = cloudcover != None
 
-            p = unzipimage(entity_id, location)
+                        image_location = move_images_after_downloaded(lsdestdir, isFilterEnabled, cloudcover)
+                        if image_location != None:
+                            image_locations += '%s;' % image_location
+                            continue
+                    else:
+                        print("Got some problem when unzipping. Attempt to redownload the images")
+                        is_downloaded = False
+                        is_unzipped = False
 
-            check = 0
-            if p == 1 and cloudcover != None and cloudcover != "":
-                check = check_cloud_limit(lsdestdir, float(cloudcover))
-            if check == 0:
+            if not(is_downloaded):
+                url = "https://earthexplorer.usgs.gov/download/%s/%s/STANDARD/EE" % (repert, entity_id)
+                print(url)
+
+                try:
+                    downloadChunks(url, "%s" % location, entity_id+'.tgz')
+                except:
+                    print('product %s not found' % entity_id)
+
+            unzip_success = unzipimage(entity_id, location)
+
+            if unzip_success == 1:
                 isFilterEnabled = cloudcover != None
 
                 image_location = move_images_after_downloaded(lsdestdir, isFilterEnabled, cloudcover)
                 if image_location != None:
                     image_locations += '%s;' % image_location
-                # organize_images(isFilterEnabled, cloudcover)
     except KeyboardInterrupt:
         print('Interrupted')
         try:
