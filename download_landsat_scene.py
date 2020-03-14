@@ -495,6 +495,8 @@ def download_scene_api(input_file, csv_data):
         print(results)
 
         (repert, stations) = get_repert_and_stations(satellite)
+        satellite = satellite[0:2] + "0" + satellite[2:]
+        print(satellite)
 
         connect_earthexplorer_no_proxy(usgs)
 
