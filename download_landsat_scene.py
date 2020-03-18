@@ -460,7 +460,7 @@ def download_scene_api(input_file, csv_data):
     downloaded_path = csv_data["downloaded_path"]
     
     print(id, lat, lng, start_date, end_date, size, satellite, station, cloudcover, downloaded_path)
-    if downloaded_path != None and downloaded_path.strip() != "":
+    if downloaded_path != None and downloaded_path.strip() != "" and not("EXCEPTION" in downloaded_path.upper()):
         print("Images already downloaded. Here is the path to image's folder")
         paths = downloaded_path.split(';')
         for path in paths:
@@ -549,15 +549,20 @@ def download_scene_api(input_file, csv_data):
                         is_downloaded = False
                         is_unzipped = False
                 else:
-                    unzip_success = unzipimage(entity_id, location)
-                    if unzip_success == 1:
-                        isFilterEnabled = cloudcover != None
+                    try:
+                        unzip_success = unzipimage(entity_id, location)
+                        if unzip_success == 1:
+                            isFilterEnabled = cloudcover != None
 
-                        image_location = move_images_after_downloaded(lsdestdir, isFilterEnabled, cloudcover)
-                        if image_location != None:
-                            image_locations += '%s;' % image_location
-                            continue
-                    else:
+                            image_location = move_images_after_downloaded(lsdestdir, isFilterEnabled, cloudcover)
+                            if image_location != None:
+                                image_locations += '%s;' % image_location
+                                continue
+                        else:
+                            print("Got some problem when unzipping. Attempt to redownload the images")
+                            is_downloaded = False
+                            is_unzipped = False
+                    except:
                         print("Got some problem when unzipping. Attempt to redownload the images")
                         is_downloaded = False
                         is_unzipped = False
