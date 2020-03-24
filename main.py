@@ -52,12 +52,12 @@ def main(choice):
                 satellite = str(line["satellite"])
                 downloaded_path = str(line["downloaded_path"])
 
-                if downloaded_path == None or downloaded_path == "" or downloaded_path == "NODATA" or downloaded_path.strip() != "" or ("EXCEPTION" in downloaded_path.upper()):
+                if downloaded_path == None or downloaded_path == "" or downloaded_path == "NODATA" or downloaded_path.strip() == "" or ("EXCEPTION" in downloaded_path.upper()):
                     with open(inputf, "a") as a:
                         writer = csv.writer(a)
                         writer.writerow(line.values())
                     continue
-
+                
                 dirs = downloaded_path.split(';')
                 dirs.remove('')
                 band_to_crop = ("B2.TIF", "B3.TIF", "B4.TIF") # B, G, R
