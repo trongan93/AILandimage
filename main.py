@@ -52,7 +52,7 @@ def main(choice):
                 satellite = str(line["satellite"])
                 downloaded_path = str(line["downloaded_path"])
 
-                if downloaded_path == None or downloaded_path == "" or downloaded_path == "NODATA":
+                if downloaded_path == None or downloaded_path == "" or downloaded_path == "NODATA" or downloaded_path.strip() != "" or ("EXCEPTION" in downloaded_path.upper()):
                     with open(inputf, "a") as a:
                         writer = csv.writer(a)
                         writer.writerow(line.values())

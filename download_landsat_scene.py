@@ -177,6 +177,8 @@ def get_valid_metadata_field_names_based_on_satellite(satellite):
         attribute_names.extend(['WRS_PATH', 'WRS_ROW', 'CLOUD_COVER'])
     elif satellite == 'LC08':
         attribute_names.extend(['WRS_PATH', 'WRS_ROW', 'CLOUD_COVER'])
+    elif satellite == 'LO08':
+        attribute_names.extend(['WRS_PATH', 'WRS_ROW', 'CLOUD_COVER'])
     elif satellite == 'LT05':
         attribute_names.extend(['WRS_PATH', 'WRS_ROW', 'CLOUD_COVER'])
 

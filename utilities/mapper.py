@@ -8,6 +8,10 @@ def map_metadata_fieldname_to_general_name():
     mapper[('LC08', 'WRS_ROW')] = 'WRS_ROW'
     mapper[('LC08', 'CLOUDCOVER')] = 'CLOUD_COVER'
 
+    mapper[('LO08', 'WRS_PATH')] = 'WRS_PATH'
+    mapper[('LO08', 'WRS_ROW')] = 'WRS_ROW'
+    mapper[('LO08', 'CLOUDCOVER')] = 'CLOUD_COVER'
+
     mapper[('LE07', 'WRS_PATH')] = 'WRS_PATH'
     mapper[('LE07', 'WRS_ROW')] = 'WRS_ROW'
     mapper[('LE07', 'CLOUDCOVER')] = 'CLOUD_COVER'
