@@ -26,7 +26,12 @@ def crop_image_based_on_impact(path, impact, lng, lat):
     
     if row < 0 or row > img.shape[0] or col < 0 or col > img.shape[1]:
         print("Lat lng out of range")
-        return
+        print("Img coors:")
+        print(row)
+        print(col)
+        print("Img shape:")
+        print(img.shape)
+        return np.array([])
 
     # print("Row: ", row)
     # print("Col: ", col)
