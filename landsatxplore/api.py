@@ -46,10 +46,16 @@ class API(object):
 
     def login(self, username, password):
         """Get an API key."""
-        data = to_json(username=username, password=password, catalogID='EE')
-        response = requests.post(self.endpoint + 'login?', data=data).json()
+        retry = 5
+        while (retry > 0):
+            data = to_json(username=username, password=password, catalogID='EE')
+            response = requests.post(self.endpoint + 'login?', data=data).json()
+            if response['data']:
+                break
+            retry -= 1
         if response['error']:
             raise EarthExplorerError('EE: {}'.format(response['error']))
+
         return response['data']
 
     def logout(self):

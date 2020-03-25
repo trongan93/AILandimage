@@ -4,7 +4,7 @@ from enums import LANDSLIDE_IMPACT_SIZE
 import matplotlib.pyplot as plt
 import cv2
 
-def get_rect(img, row, col, size=(600, 600)):
+def get_rect(img, row, col, size=(750, 750)):
     width, height = size
     top_left_x = 0
     top_left_y = 0

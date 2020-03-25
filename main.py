@@ -90,18 +90,28 @@ def main(choice):
                     imageio.imsave(filepath + '.TIF', before_read_img)
 
                     band_files = []
+                    is_out_of_range = False
                     for filename in os.listdir(dir):
                         # print(filename)
                         if filename.endswith(band_to_crop):
                             filepath = os.path.join(dir, filename)
                             rgb_img = crop_image_based_on_impact(filepath, size, lng, lat)
 
-                            cropped_folder = os.path.join(dir, "cropped")
-                            makedir_if_path_not_exists(cropped_folder)
-                            band_files.append(os.path.join(cropped_folder, f'cropped_{size}_{filename}'))
+                            if (rgb_img):
+                                cropped_folder = os.path.join(dir, "cropped")
+                                makedir_if_path_not_exists(cropped_folder)
+                                band_files.append(os.path.join(cropped_folder, f'cropped_{size}_{filename}'))
 
-                            cv2.imwrite(os.path.join(cropped_folder, f'cropped_{size}_{filename}'), rgb_img)
+                                cv2.imwrite(os.path.join(cropped_folder, f'cropped_{size}_{filename}'), rgb_img)
+                            else:
+                                is_out_of_range = True
+                                break
                     
+                    if (is_out_of_range):
+                        dir = os.path.join(dir, "error", "latlng_out_of_range")
+                        final_paths.append(dir)
+                        break
+
                     rgb_img = combine_bands(cropped_folder, satellite)
                     rgb_img = rgb_img + 60
                     try:
