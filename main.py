@@ -97,7 +97,7 @@ def main(choice):
                             filepath = os.path.join(dir, filename)
                             rgb_img = crop_image_based_on_impact(filepath, size, lng, lat)
 
-                            if (rgb_img.size == 0):
+                            if (rgb_img.size != 0):
                                 cropped_folder = os.path.join(dir, "cropped")
                                 makedir_if_path_not_exists(cropped_folder)
                                 band_files.append(os.path.join(cropped_folder, f'cropped_{size}_{filename}'))
