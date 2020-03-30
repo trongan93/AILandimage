@@ -48,6 +48,20 @@ def crop_image_based_on_impact(path, impact, lng, lat):
 
     return img
 
+def crop_image_center(path, impact):
+    img = cv2.imread(path)
+
+    if impact == 'Extra Large':
+        impact = 'EXTRA_LARGE'
+    impact_size = get_impact_size(impact)    
+    img = get_rect(img, img.shape[0]//2, img.shape[1]//2, impact_size)
+
+    print(img.shape)
+    # plt.imshow(img)
+    # plt.show()
+
+    return img
+
 # lat 38.43660
 # lon -117.29791
 # crop_image_based_on_impact("/mnt/d/ProjectData/Landsat/Images//040034/2011-02-10/LT05/CLOUDCOVER/LT05_L1TP_040034_20110210_20160901_01_T1_B1.TIF", "VERY_LARGE", -116, 37)

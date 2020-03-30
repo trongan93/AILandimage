@@ -20,6 +20,8 @@ import csv
 import re
 import json
 
+from random import uniform
+
 from constants import *
 from convert_to_wrs import ConvertToWRS
 from utilities.earthexplorer_connector import *
@@ -84,6 +86,51 @@ def downloadChunks(url, rep, nom_fic):
                 if not chunk:
                     break
                 fp.write(chunk)
+    except urllib.error.HTTPError as e:
+        if e.code == 500:
+            # print(e)
+            pass  # File doesn't exist
+        else:
+            print("HTTP Error:", e.code, url)
+        return False
+    except urllib.error.URLError as e:
+        print("URL Error:", e.reason, url)
+        return False
+
+    return rep, nom_fic
+
+def download_chunks_no_content_length(url, rep, nom_fic):
+    """
+    Download files in chunk (response does not contain content-length)
+    """
+    try:
+        req = urllib.request.urlopen(url)
+        # if downloaded file is html
+        if (req.info().get_content_type() == 'text/html'):
+            print("error : file is in html and not an expected binary file")
+            lines = req.read()
+            if lines.find('Download Not Found') > 0:
+                raise TypeError
+            else:
+                with open("error_output.html", "w") as f:
+                    f.write(lines)
+                print("result saved in ./error_output.html")
+                sys.exit(-1)
+
+        # download
+        downloaded = 0
+        CHUNK = 1024 * 1024 * 8
+        with open(rep+'/'+nom_fic, 'wb') as fp:
+            start = time.process_time()
+            print('Downloading {0}:'.format(nom_fic))
+            while True:
+                chunk = req.read(CHUNK)
+                downloaded += len(chunk)
+                sys.stdout.flush()
+                if not chunk:
+                    break
+                fp.write(chunk)
+            print('Done')
     except urllib.error.HTTPError as e:
         if e.code == 500:
             # print(e)
@@ -602,3 +649,77 @@ def download_scene_api(input_file, csv_data):
         image_locations = "NODATA"
     
     return image_locations
+
+
+
+
+def random_lat():
+    return uniform(-90.0, 90.0)
+
+def random_lng():
+    return uniform(-180.0, 180.0)
+
+#lat (-90 -> 90)
+#lng (-180 -> 180)
+#cloudcover < 10
+# random crop_size enum
+# 500
+def download_random_images(num_img = 500, satellite = 'LC8'):
+    usgs = read_usgs_credential_file()
+    (repert, stations) = get_repert_and_stations(satellite)
+    
+    results = []
+
+    while (num_img > 0):
+        lat = random_lat()
+        lng = random_lng()
+        date_end = datetime.datetime.today()
+        date_start = datetime.datetime.today() - datetime.timedelta(days=40)
+        cloudcover = 10
+
+        api = API(usgs['account'], usgs['passwd'])
+        # ee = EarthExplorer(usgs['account'], usgs['passwd'])
+        
+        dataset = map_dataset(satellite)
+
+        where = {'dataset': dataset}
+        where.update(latitude=lat, longitude=lng)
+        where.update(max_cloud_cover=cloudcover)
+        where.update(start_date=f'{date_start.year}-{date_start.month}-{date_start.day}')
+        where.update(end_date=f'{date_end.year}-{date_end.month}-{date_end.day}')
+
+        api_results = api.search(**where)
+        api.logout()
+
+        if not api_results:
+            continue
+        
+        print(api_results)
+
+        connect_earthexplorer_no_proxy(usgs)
+        for scene in api_results:
+            dump = json.dumps(api_results, indent=True)
+            print(dump)
+
+            entity_id = scene["entityId"]
+            download_url = scene["downloadUrl"]
+            scene_cloud_cover = str(int(scene["cloudCover"]))
+            acquisition_date = scene["acquisitionDate"]
+            start_time = scene["startTime"]
+            end_time = scene["endTime"]
+
+            wrs = get_wrs(entity_id)
+            print(wrs["path"])
+            print(wrs["row"])
+
+            location = os.path.join(IMAGE_BASE_PATH, 'random-images') 
+            makedir_if_path_not_exists(location)
+
+            url = "https://earthexplorer.usgs.gov/download/%s/%s/FR_REFL/EE" % (repert, entity_id)
+            print(url)
+
+            download_chunks_no_content_length(url, "%s" % location, entity_id + '.jpg')
+            
+            results.append((os.path.join(location, entity_id + '.jpg'), lat, lng))
+            num_img -= 1
+    return results

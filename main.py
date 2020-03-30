@@ -3,6 +3,7 @@ from crop_image import *
 from constants import *
 from utilities.image_pre import *
 from utilities.raw_image_file_data import *
+from random import choice
 
 import imageio
 
@@ -148,11 +149,35 @@ def main(choice):
                 with open(inputf, "a") as a:
                     writer = csv.writer(a)
                     writer.writerow(line.values())
-        
+    elif choice == 3:
+        download_and_crop_random_images()
 
+def random_crop_size():
+    impact_size = ['EXTRA_LARGE', 'VERY_SMALL', 'SMALL', 'MEDIUM', 'LARGE', 'VERY_LARGE', 'UNKNOWN']
+    return choice(impact_size)
+
+def download_and_crop_random_images():
+    natural_color_images = download_random_images(5)
+    cropped_folder = os.path.join(IMAGE_BASE_PATH, 'random-images', 'cropped')
+    makedir_if_path_not_exists(cropped_folder)
+    
+    for img in natural_color_images:
+        crop_size = random_crop_size()
+        new_img = crop_image_center(img[0], crop_size)
+
+        filename = os.path.basename(img[0])
+        filepath = os.path.join(cropped_folder, filename)
+        # image_writer = FileRawData(cropped_folder)
+        # image_writer.save_feature_raw_image(filename, new_img)
+
+        # read_img = image_writer.read_feature_raw_image(filename, new_img.shape)
+        print(filepath)
+
+        imageio.imsave(filepath, new_img)
 
 
 if __name__ == "__main__":
     # 1 for downloading new landsat data
     # 2 for cropping and combining image
+    # 3 for downloading and cropping random natural color image
     main(sys.argv[1])  
