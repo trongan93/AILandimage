@@ -27,5 +27,5 @@ def merge_image_to_dataset(csv_file_path, landslide_dataset_path):
 
 # Run on Data server at viplab3
 # merge_image_to_dataset("/home/trongan93/Desktop/input_0_280.csv", "/mnt/d/LandslideData/Landsat/")
-merge_image_to_dataset("/mnt/d/LandslideData/Landsat/input_0_280.csv", "/mnt/d/LandslideData/Landsat/")
-merge_image_to_dataset("/mnt/d/LandslideData/Landsat/input_281_560.csv", "/mnt/d/LandslideData/Landsat/")
+merge_image_to_dataset("/mnt/d/LandslideData/input_0_280.csv", "/mnt/d/LandslideData/Landsat/")
+merge_image_to_dataset("/mnt/d/LandslideData/input_281_560.csv", "/mnt/d/LandslideData/Landsat/")
