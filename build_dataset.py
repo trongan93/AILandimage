@@ -18,7 +18,7 @@ def safe_copy(source, destination):
         destination = os.path.exists(f'{base}_{index}{extension}')
         while os.path.exists(destination):
             index += 1
-            destination = os.path.exists(f'{basename}_{index}{extension}')
+            destination = os.path.exists(f'{base}_{index}{extension}')
     
     shutil.copy(source, destination)
 
