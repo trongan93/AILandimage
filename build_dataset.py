@@ -19,7 +19,7 @@ def merge_image_to_dataset(csv_file_path, landslide_dataset_path):
                 path_in_data_server = change_path_in_dataserver(downloaded_img_path)
                 img_files = os.listdir(path_in_data_server)
                 for f in img_files:
-                    img_path = path_in_data_server + f
+                    img_path = str(path_in_data_server) + f
                     print(img_path)
                     shutil.copy(img_path, landslide_dataset_path)
 
