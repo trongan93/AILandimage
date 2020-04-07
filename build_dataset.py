@@ -15,10 +15,10 @@ def safe_copy(source, destination):
     if os.path.exists(destination):
         base, extension = os.path.splitext(destination)
         index = 1
-        destination = os.path.exists(f'{base}_{index}{extension}')
+        destination = f'{base}_{index}{extension}'
         while os.path.exists(destination):
             index += 1
-            destination = os.path.exists(f'{base}_{index}{extension}')
+            destination = f'{base}_{index}{extension}'
     
     shutil.copy(source, destination)
 
