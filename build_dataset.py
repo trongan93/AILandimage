@@ -33,6 +33,10 @@ def merge_image_to_dataset(csv_file_path, landslide_dataset_path):
 
             for downloaded_img_path in downloadedpath_members:
                 path_in_data_server = change_path_in_dataserver(downloaded_img_path)
+                
+                if not(path_in_data_server):
+                    continue
+
                 img_files = os.listdir(path_in_data_server)
                 if(len(img_files) > 0):
                     for f in img_files:
