@@ -7,7 +7,7 @@ import imageio
 satellite = "LC8"
 if satellite == "LC8":
     band_to_crop = ("B2.TIF", "B3.TIF", "B4.TIF") # B, G, R
-dir = "/home/trongan93/Downloads/LC08_L1TP_141041_20140918_20170419_01_T1"
+dir = "/mnt/d/ProjectData/CubeSAT/test-data/LC08_L1TP_141041_20130915_20170502_01_T1"
 size = 'VERY_LARGE'
 lng = '85.868467'
 lat = '27.770733'
@@ -66,7 +66,7 @@ except:
     else:
         print("Something wrong")
 
-plt.imshow(rgb_img)
+plt.imshow(rgb_img, origin='lower')
 plt.show()
 
 filename = f'{float(lat)}_{float(lng)}_{size}_cropped'
