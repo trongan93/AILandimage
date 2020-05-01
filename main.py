@@ -103,7 +103,7 @@ def main(choice):
                                 makedir_if_path_not_exists(cropped_folder)
                                 band_files.append(os.path.join(cropped_folder, f'cropped_{size}_{filename}'))
 
-                                cv2.imwrite(os.path.join(cropped_folder, f'cropped_{size}_{filename}'), rgb_img)
+                                imageio.imsave(os.path.join(cropped_folder, f'cropped_{size}_{filename}'), rgb_img)
                             else:
                                 is_out_of_range = True
                                 break
