@@ -40,7 +40,7 @@ def sync_landslidedata_to_input_csv(first_sync = False):
                         continue
                     date_ = utc_to_normal_date(data['date_'])
                     start_date = parse_date(date_)
-                    end_date = start_date + datetime.timedelta(days=180)
+                    end_date = start_date + datetime.timedelta(days=91)
 
                     line['start_date'] = date_
                     line['end_date'] = convert_date_to_normal_date_str(end_date)
