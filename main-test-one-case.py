@@ -7,8 +7,10 @@ import imageio
 satellite = "LC8"
 if satellite == "LC8":
     band_to_crop = ("B2.TIF", "B3.TIF", "B4.TIF") # B, G, R
-dir = "/mnt/d/ProjectData/CubeSAT/test-data/LC08_L1TP_141041_20130915_20170502_01_T1"
-size = 'VERY_LARGE'
+# dir = "/mnt/d/ProjectData/CubeSAT/test-data/LC08_L1TP_141041_20130915_20170502_01_T1" #on local computer - viplab
+dir = "/mnt/d/ProjectData/Landsat/LandslideTest/LC08_L1TP_141041_20140918_20170419_01_T1" #on viplab-server1
+size = 'CNN_FIX' #'VERY_LARGE'
+# size = 'VERY_LARGE'
 lng = '85.868467'
 lat = '27.770733'
 
