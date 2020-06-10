@@ -4,6 +4,7 @@ from constants import *
 from utilities.image_pre import *
 from utilities.raw_image_file_data import *
 from random import choice
+from random_negative_landslide import *
 
 import imageio
 
@@ -150,7 +151,8 @@ def main(choice):
                     writer = csv.writer(a)
                     writer.writerow(line.values())
     elif choice == 3:
-        download_and_crop_random_images()
+        # download_and_crop_random_images()
+        create_negative_landslide(inputf)
 
 def random_crop_size():
     impact_size = ['EXTRA_LARGE', 'VERY_SMALL', 'SMALL', 'MEDIUM', 'LARGE', 'VERY_LARGE', 'UNKNOWN']
