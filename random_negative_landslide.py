@@ -20,8 +20,18 @@ def create_negative_landslide(inputf):
                 random_withoutlandslide_points.append(new_point)
                 # print('new point lat: ', new_point.latitude, ' , origin lng: ', new_point.longitude)
         # print('size of random points is ', len(random_withoutlandslide_points))
-        # download_path = row['']
+        downloaded_path = row['downloaded_path']
+        if downloaded_path == None or downloaded_path == "" or downloaded_path == "NODATA" or downloaded_path.strip() == "" or ("EXCEPTION" in downloaded_path.upper()):
+            break
+
+        dirs = downloaded_path.split(';')
+        dirs.remove('')
+        for dir in dirs:
+            status = crop_new_negative_img(dir)
 
 
+def crop_new_negative_img(dir):
+    print('current dir to landsat img with landslide: ', dir)
+    return 1
 
     print("Done create negative landslide data")
