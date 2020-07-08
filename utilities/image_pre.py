@@ -94,6 +94,7 @@ def file_name_band(_filename):
 # Automatic brightness and contrast optimization with optional histogram clipping
 #Ref: https://stackoverflow.com/questions/56905592/automatic-contrast-and-brightness-adjustment-of-a-color-photo-of-a-sheet-of-pape/56909036
 def automatic_brightness_and_contrast(image, clip_hist_percent=1):
+    print("Automatic brightness and contrast")
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # Calculate grayscale histogram
