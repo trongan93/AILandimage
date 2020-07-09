@@ -123,6 +123,8 @@ def automatic_brightness_and_contrast(image, clip_hist_percent=1):
         maximum_gray -= 1
 
     # Calculate alpha and beta values
+    if(maximum_gray - minimum_gray == 0):
+        return image
     alpha = 255 / (maximum_gray - minimum_gray)
     beta = -minimum_gray * alpha
 
