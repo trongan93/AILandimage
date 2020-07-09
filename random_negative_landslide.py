@@ -24,7 +24,7 @@ def create_negative_landslide(inputf):
         if downloaded_path == None or downloaded_path == "" or downloaded_path == "NODATA" or downloaded_path.strip() == "" or (
                 "EXCEPTION" in downloaded_path.upper()):
             print("Download path error at index: ", index)
-            break
+            continue
         dirs = downloaded_path.split(';')
         dirs.remove('')
 
