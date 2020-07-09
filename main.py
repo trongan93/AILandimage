@@ -4,14 +4,20 @@ from constants import *
 from utilities.image_pre import *
 from utilities.raw_image_file_data import *
 from random import choice
+from random_negative_landslide import *
 
 import imageio
+from utilities.project_log import LogProgram
+
+log = LogProgram('main')
+
 
 def main(choice):
     inputf = INPUT_FILE_PATH
     choice = int(choice)
     ### Download landsat scene
     if choice == 1:
+        log.info('Choice 1 is selected')
         with open(inputf, "r") as f:
             input_csv = csv.DictReader(f, delimiter=',')
             inputs = list(input_csv)
@@ -35,6 +41,7 @@ def main(choice):
      ### Created by trongan93 Nov 27th
         ### Read csv file after downloaded, check field size and call crop_image.py function. Central of crop_image is lat,lng, size of crop image is depended on size in input file.
     elif choice == 2:
+        log.info('Choice 2 is selected')
         with open(inputf, 'r') as f:
             input_csv = csv.DictReader(f, delimiter=',')
             inputs = list(input_csv)
@@ -150,7 +157,9 @@ def main(choice):
                     writer = csv.writer(a)
                     writer.writerow(line.values())
     elif choice == 3:
-        download_and_crop_random_images()
+        logger = log.info('Bui Trong An Test')
+        # download_and_crop_random_images()
+        create_negative_landslide(inputf)
 
 def random_crop_size():
     impact_size = ['EXTRA_LARGE', 'VERY_SMALL', 'SMALL', 'MEDIUM', 'LARGE', 'VERY_LARGE', 'UNKNOWN']

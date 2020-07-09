@@ -54,6 +54,9 @@ lat,lng,start_date (yyyymmdd),end_date (yyyymmdd),cloudcover,satellite,station,d
 - Cropped and combine images by running
 > python main.py 2
 
+- Generating the negative landslide image from downloaded image
+ > python main.py 3
+
 After downloading an image at DOWNLOADED_BASE_PATH folder, the image will be moved to IMAGE_BASE_PATH folder with the following structure:
 /location/date/satellite/filter
 

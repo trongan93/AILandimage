@@ -25,24 +25,16 @@ def crop_image_based_on_impact(path, impact, lng, lat):
     row, col = lnglat_to_image_coors(path, lng, lat)
     
     if row < 0 or row > img.shape[0] or col < 0 or col > img.shape[1]:
-        print("Lat lng out of range")
-        print("Img coors:")
-        print(row)
-        print(col)
-        print("Img shape:")
-        print(img.shape)
+        print('Lat lng out of range. Coordinate [',col,',',row,'] not in range ', img.shape)
         return np.array([])
 
-    # print("Row: ", row)
-    # print("Col: ", col)
-    # print("Pixel value: ", img[row][col])
 
     if impact == 'Extra Large':
         impact = 'EXTRA_LARGE'
     impact_size = get_impact_size(impact)    
     img = get_rect(img, row, col, impact_size)
 
-    print(img.shape)
+    # print("cropped size: ", img.shape)
     # plt.imshow(img)
     # plt.show()
 
