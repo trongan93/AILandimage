@@ -42,10 +42,28 @@ class AInputCsvDataBuilder(ABC):
         input_file = self.get_input_file()
         self.build_csv_header(input_file)
 
-        with open(self.get_csv_file_path(), "r") as f2:
-            landslide_data = csv.DictReader(f2, delimiter=',')
-            self.build_csv_data(landslide_data, input_file)
-            
+        with open(inputf, "a") as inpf:
+            for satellite in ['LC8', 'LE7', 'LT5']:
+                line = OrderedDict()
+                line['id'] = count
+                line['lat'] = data['latitude']
+                line['lng'] = data['longitude']
+
+                if not(data['date_']): 
+                    continue
+                date_ = utc_to_normal_date(data['date_'])
+                start_date = parse_date(date_)
+                end_date = start_date + datetime.timedelta(days=91)
+
+                line['start_date'] = date_
+                line['end_date'] = convert_date_to_normal_date_str(end_date)
+                    
+                line['size'] = data['landslide1']
+                line['cloudcover'] = '100'
+                line['satellite'] = satellite
+                line['station'] = 'ALL'
+                line["downloaded_path"] = ''
+
         print("All necessary fields are extracted")
 
     def build_csv_data(self, source_data, input_file):
@@ -152,6 +170,8 @@ class InputCSVFactory():
 
 
 if __name__ == "__main__":
+    sync_landslidedata_to_input_csv(True)  
     factory = InputCSVFactory(LANDSLIDE_DATA_FILE_PATH, INPUT_FILE_PATH, "NASA_GLOBAL_LANDSLIDE")
     builder = factory.create_csv_builder()
     builder.build_input_csv_file()
+
