@@ -18,15 +18,21 @@ def create_negative_landslide(inputf):
     # print('keys: ', data1.keys())
 
     for index, row in data1.iterrows():
+        print("row read index: ", index)
+        dirs = []
+        print("Negative landslide image is generating at index: ", index)
         landslide_point = geopy.Point(row['lat'],row['lng'])
         satellite = str(row["satellite"])
         downloaded_path = row['downloaded_path']
-        if downloaded_path == None or downloaded_path == "" or downloaded_path == "NODATA" or downloaded_path.strip() == "" or (
-                "EXCEPTION" in downloaded_path.upper()):
+        if downloaded_path == None or downloaded_path == "" or downloaded_path == "NODATA" or downloaded_path.strip() == "" or ("EXCEPTION" in downloaded_path.upper()):
             print("Download path error at index: ", index)
+            print(downloaded_path)
             continue
         dirs = downloaded_path.split(';')
-        dirs.remove('')
+        try:
+            dirs.remove('')
+        except:
+            print("print error in remove empty character")
 
         random_withoutlandslide_points = []
         for random_dist in random_distances:
@@ -40,7 +46,6 @@ def create_negative_landslide(inputf):
             crop_status = crop_new_negative_img(dir, random_withoutlandslide_points, satellite)
             if crop_status != 1:
                 print('Failed to created negative landslide region on: ', dir)
-
 
 
 
