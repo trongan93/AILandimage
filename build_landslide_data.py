@@ -4,22 +4,29 @@ import pandas as pd
 
 def countByLandslideSize(landslideRecords):
     print(len(landslideRecords))
-    countLarge = countMedium = countVerLarge = countSmall = countOther = 0
+    countLarge = countMedium = countVeryLarge = countSmall = countExtraLarge = countOther = 0
     for record in landslideRecords:
-        if record.size == "Medium":
+        if record.size == "Medium" or record.size == "medium":
             countMedium += 1
-        elif record.size == "Large":
+        elif record.size == "Large" or record.size == "large":
             countLarge += 1
         elif record.size == "Very_large":
-            countVerLarge += 1
-        elif record.size == "Small":
+            countVeryLarge += 1
+        elif record.size == "Small" or record.size == "small":
             countSmall += 1
+        elif record.size == "Extra_large" or record.size == "EXTRA_LARGE" or record.size == "Extra Large":
+            countExtraLarge += 1
         else:
             countOther +=1
+            print("Other size: ", record.size)
     print("Landslide number of Small size: ", countSmall)
+
+
+
     print("Landslide number of Medium size: ", countMedium)
     print("Landslide number of Large size: ", countLarge)
-    print("Landslide number of Very large size: ", countVerLarge)
+    print("Landslide number of Very large size: ", countVeryLarge)
+    print("Landslide number of Extra large size: ", countExtraLarge)
     print("Landslide number of another size: ", countOther)
 
 
