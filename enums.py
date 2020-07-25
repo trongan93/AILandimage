@@ -35,12 +35,20 @@ class PRODUCT_METADATA(Enum):
     NADIR_OFFNADIR = 'NADIR_OFFNADIR'
     DATE_ACQUIRED = 'DATE_ACQUIRED'
 
+# class LANDSLIDE_IMPACT_SIZE(Enum):
+#     CNN_FIX = (224,224)
+#     VERY_SMALL = (250, 250)
+#     SMALL = (350, 350)
+#     MEDIUM = (450, 450)
+#     LARGE = (1300, 1300)
+#     VERY_LARGE = (1800, 1800)
+#     EXTRA_LARGE = (2500, 2500)
+#     UNKNOWN = (750, 750)
+
+# Paper "Landslide localization in remote sensing by a convolution neural network" configuration
+# Case L1 + VL1
 class LANDSLIDE_IMPACT_SIZE(Enum):
     CNN_FIX = (224,224)
-    VERY_SMALL = (250, 250)
-    SMALL = (350, 350)
-    MEDIUM = (450, 450)
-    LARGE = (1300, 1300)
-    VERY_LARGE = (1800, 1800)
-    EXTRA_LARGE = (2500, 2500)
-    UNKNOWN = (750, 750)
+    LARGE = (3333, 3333)
+    VERY_LARGE = (7711, 7711)
+    EXTRA_LARGE = (7711, 7711) #maxima image size
