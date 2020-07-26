@@ -42,120 +42,122 @@ def main(choice):
         ### Read csv file after downloaded, check field size and call crop_image.py function. Central of crop_image is lat,lng, size of crop image is depended on size in input file.
     elif choice == 2:
         log.info('Choice 2 is selected')
-        with open(inputf, 'r') as f:
-            input_csv = csv.DictReader(f, delimiter=',')
-            inputs = list(input_csv)
-        os.remove(inputf)
+        # with open(inputf, 'r') as f:
+        #     input_csv = csv.DictReader(f, delimiter=',')
+        #     inputs = list(input_csv)
+        # os.remove(inputf)
+        #
+        #     # create csv header
+        # with open(inputf, 'a') as a:
+        #     writer = csv.writer(a)
+        #     writer.writerow(['id','lat','lng','start_date','end_date','size','cloudcover','satellite','station','downloaded_path'])
+        path = './' + inputf
+        downloaded_data = pd.read_csv(path)
 
-            # create csv header
-        with open(inputf, 'a') as a:
-            writer = csv.writer(a)
-            writer.writerow(['id','lat','lng','start_date','end_date','size','cloudcover','satellite','station','downloaded_path'])
-        
-        with open(inputf, 'r') as f:
-            for line in inputs:
-                lat = float(line["lat"])
-                lng = float(line["lng"])
-                size = str(line["size"])
-                satellite = str(line["satellite"])
-                downloaded_path = str(line["downloaded_path"])
+        for index, line in downloaded_data.iterrows():
+            print("Cropping image with id: ", line['id'], " and location - lat:", line["lat"], " lng: ", line["lng"])
+            lat = float(line["lat"])
+            lng = float(line["lng"])
+            size = str(line["size"])
+            satellite = str(line["satellite"])
+            downloaded_path = str(line["downloaded_path"])
 
-                if downloaded_path == None or downloaded_path == "" or downloaded_path == "NODATA" or downloaded_path.strip() == "" or ("EXCEPTION" in downloaded_path.upper()):
-                    with open(inputf, "a") as a:
-                        writer = csv.writer(a)
-                        writer.writerow(line.values())
-                    continue
-                
-                dirs = downloaded_path.split(';')
-                dirs.remove('')
+            if downloaded_path == None or downloaded_path == "" or downloaded_path == "NODATA" or downloaded_path.strip() == "" or ("EXCEPTION" in downloaded_path.upper()):
+                # with open(inputf, "a") as a:
+                #     writer = csv.writer(a)
+                #     writer.writerow(line.values())
+                continue
+
+            dirs = downloaded_path.split(';')
+            # dirs.remove('')
+            band_to_crop = ("B2.TIF", "B3.TIF", "B4.TIF") # B, G, R
+            if satellite == "LE7":
+                band_to_crop = ("B1.TIF", "B2.TIF", "B3.TIF")
+            elif satellite == "LT5":
+                band_to_crop = ("B1.TIF", "B2.TIF", "B3.TIF")
+            elif satellite == "LC8":
                 band_to_crop = ("B2.TIF", "B3.TIF", "B4.TIF") # B, G, R
-                if satellite == "LE7":
-                    band_to_crop = ("B1.TIF", "B2.TIF", "B3.TIF")
-                elif satellite == "LT5":
-                    band_to_crop = ("B1.TIF", "B2.TIF", "B3.TIF")
-                elif satellite == "LC8":
-                    band_to_crop = ("B2.TIF", "B3.TIF", "B4.TIF") # B, G, R
-                final_paths = []
-                for dir in dirs:
-                    if not(os.path.exists(dir)):
-                        continue
+            final_paths = []
+            for dir in dirs:
+                if not(os.path.exists(dir)):
+                    continue
+                print("Downloaded path: ", dir)
+                cropped_folder = ""
 
-                    cropped_folder = ""
-                    
-                    before_cropped = FileRawData(dir)
-                    before_cropped_image = combine_bands(dir, satellite)
-                    before_cropped_image = automatic_brightness_and_contrast(before_cropped_image)
-                    
-                    before_cropped.save_feature_raw_image('before_cropped', before_cropped_image)
-                    # # plt.imshow(before_cropped_image)
-                    # # plt.show()
+                before_cropped = FileRawData(dir)
+                before_cropped_image = combine_bands(dir, satellite)
+                # before_cropped_image = automatic_brightness_and_contrast(before_cropped_image)
 
-                    before_read_img = before_cropped.read_feature_raw_image('before_cropped', before_cropped_image.shape)
-                    # plt.imshow(read_img)
-                    # plt.show()
+                before_cropped.save_feature_raw_image('before_cropped', before_cropped_image)
+                # # plt.imshow(before_cropped_image)
+                # # plt.show()
 
-                    filepath = os.path.join(dir, 'before_cropped')
-                    imageio.imsave(filepath + '.TIF', before_read_img)
+                before_read_img = before_cropped.read_feature_raw_image('before_cropped', before_cropped_image.shape)
+                # plt.imshow(read_img)
+                # plt.show()
 
-                    band_files = []
-                    is_out_of_range = False
-                    for filename in os.listdir(dir):
-                        # print(filename)
-                        if filename.endswith(band_to_crop):
-                            filepath = os.path.join(dir, filename)
-                            rgb_img = crop_image_based_on_impact(filepath, size, lng, lat)
+                filepath = os.path.join(dir, 'before_cropped')
+                imageio.imsave(filepath + '.TIF', before_read_img)
 
-                            if (rgb_img.size != 0):
-                                cropped_folder = os.path.join(dir, "cropped")
-                                makedir_if_path_not_exists(cropped_folder)
-                                band_files.append(os.path.join(cropped_folder, f'cropped_{size}_{filename}'))
+                band_files = []
+                is_out_of_range = False
+                for filename in os.listdir(dir):
+                    # print(filename)
+                    if filename.endswith(band_to_crop):
+                        filepath = os.path.join(dir, filename)
+                        rgb_img = crop_image_based_on_impact(filepath, size, lng, lat)
 
-                                imageio.imsave(os.path.join(cropped_folder, f'cropped_{size}_{filename}'), rgb_img)
-                            else:
-                                is_out_of_range = True
-                                break
-                    
-                    if (is_out_of_range):
-                        dir = os.path.join(dir, "error", "latlng_out_of_range")
-                        final_paths.append(dir)
-                        break
+                        if (rgb_img.size != 0):
+                            cropped_folder = os.path.join(dir, "cropped")
+                            makedir_if_path_not_exists(cropped_folder)
+                            band_files.append(os.path.join(cropped_folder, f'cropped_{size}_{filename}'))
 
-                    rgb_img = combine_bands(cropped_folder, satellite)
-                    rgb_img = rgb_img + 60
-                    try:
-                        rgb_img = automatic_brightness_and_contrast(rgb_img)
-                    except:
-                        if float(line["cloudcover"]) > 90:
-                            print("Cloudcover too high, remove images")
-                            shutil.rmtree(dir)
+                            imageio.imsave(os.path.join(cropped_folder, f'cropped_{size}_{filename}'), rgb_img)
                         else:
-                            print("Something wrong")
-                        continue
-                    # plt.imshow(rgb_img)
-                    # plt.show()
-                    
-                    filename = f'{int(lat)}_{int(lng)}_{size}_cropped'
-                    filepath = os.path.join(cropped_folder, filename)
-                    raw_data = FileRawData(cropped_folder)
-                    raw_data.save_feature_raw_image(filename, rgb_img)
+                            is_out_of_range = True
+                            break
 
-                    # cv2.imwrite(filepath, rgb_img)
-                    read_img = raw_data.read_feature_raw_image(filename, rgb_img.shape)
-                    # plt.imshow(read_img)
-                    # plt.show()
-
-                    imageio.imsave(filepath + '.TIF', read_img)
-
-                    for band in band_files:
-                        os.remove(band)
+                if (is_out_of_range):
+                    dir = os.path.join(dir, "error", "latlng_out_of_range")
                     final_paths.append(dir)
-                if final_paths == []:
-                    line["downloaded_path"] = "NODATA"
-                else:
-                    line["downloaded_path"] = ';'.join(final_paths) + ";"
-                with open(inputf, "a") as a:
-                    writer = csv.writer(a)
-                    writer.writerow(line.values())
+                    break
+
+                rgb_img = combine_bands(cropped_folder, satellite)
+                # rgb_img = rgb_img + 60
+                # try:
+                #     rgb_img = automatic_brightness_and_contrast(rgb_img)
+                # except:
+                #     if float(line["cloudcover"]) > 90:
+                #         print("Cloudcover too high, remove images")
+                #         shutil.rmtree(dir)
+                #     else:
+                #         print("Something wrong")
+                #     continue
+                # plt.imshow(rgb_img)
+                # plt.show()
+
+                filename = f'{int(lat)}_{int(lng)}_{size}_cropped'
+                filepath = os.path.join(cropped_folder, filename)
+                raw_data = FileRawData(cropped_folder)
+                raw_data.save_feature_raw_image(filename, rgb_img)
+
+                # cv2.imwrite(filepath, rgb_img)
+                read_img = raw_data.read_feature_raw_image(filename, rgb_img.shape)
+                # plt.imshow(read_img)
+                # plt.show()
+
+                imageio.imsave(filepath + '.TIF', read_img)
+
+                for band in band_files:
+                    os.remove(band)
+            #     final_paths.append(dir)
+            # if final_paths == []:
+            #     line["downloaded_path"] = "NODATA"
+            # else:
+            #     line["downloaded_path"] = ';'.join(final_paths) + ";"
+            # # with open(inputf, "a") as a:
+            # #     writer = csv.writer(a)
+            # #     writer.writerow(line.values())
     elif choice == 3:
         logger = log.info('Bui Trong An Test')
         # download_and_crop_random_images()
