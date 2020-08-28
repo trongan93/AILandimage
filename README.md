@@ -1,5 +1,6 @@
 # AILandimage
 AI Research on Landsat and Aerial Image
+## This project is closed. A new project with creating satellite images from Landsat-7/ Landsat-8/ Sentinel-2 / ALOS-2 is availbel at https://github.com/trongan93/satelliteimage-googleearth
 
 ## Prerequisites
 ###  Install GDAL
